@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { ROLES_DATA } from '@/lib/rolesData';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://sololedger.app'; // Replace with your actual domain when registered
+  const baseUrl = 'https://solo-ledger.com'; // Replace with your actual domain when registered
 
   const roleUrls = Object.keys(ROLES_DATA).map((role) => ({
     url: `${baseUrl}/rate/${role}`,

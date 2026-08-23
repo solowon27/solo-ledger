@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://sololedger.app'; // Replace with your domain
+  const baseUrl = 'https://solo-ledger.com'; // Replace with your domain
 
   return {
     rules: {
