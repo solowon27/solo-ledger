@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { ROLES_DATA } from '@/lib/rolesData';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://solo-ledger.com'; // Replace with your actual domain when registered
+  const baseUrl = 'https://solo-ledger.com';
 
   const roleUrls = Object.keys(ROLES_DATA).map((role) => ({
     url: `${baseUrl}/rate/${role}`,
@@ -17,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/w2-to-1099-calculator`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
     },
     ...roleUrls,
   ];
