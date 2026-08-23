@@ -3,11 +3,17 @@ import Link from 'next/link';
 import { Calculator } from '@/components/Calculator';
 import { AffiliateCard } from '@/components/AffiliateCard';
 import { ROLES_DATA } from '@/lib/rolesData';
+import { AFFILIATE_LINKS } from '@/lib/affiliates';
 
 export const metadata: Metadata = {
   title: 'Freelance Rate & Tax Calculator | Find Your True Hourly Rate',
-  description: 'Calculate your exact freelance hourly and day rate based on desired take-home salary, business expenses, and self-employment taxes.',
-  keywords: ['freelance hourly rate calculator', 'contractor tax calculator', 'freelance pricing model'],
+  description:
+    'Calculate your exact freelance hourly and day rate based on desired take-home salary, business expenses, and self-employment taxes.',
+  keywords: [
+    'freelance hourly rate calculator',
+    'contractor tax calculator',
+    'freelance pricing model',
+  ],
 };
 
 export default function HomePage() {
@@ -43,7 +49,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Universal Tool */}
+        {/* Universal Calculator Tool */}
         <Calculator />
 
         {/* Industry Benchmarks Navigation */}
@@ -67,7 +73,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Monetization Section */}
+        {/* Contextual Affiliate Monetization */}
         <div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
             Essential Tools for Freelance Financial Management
@@ -83,21 +89,21 @@ export default function HomePage() {
               title="FreshBooks"
               description="Automated invoicing, expense tracking, and painless tax categorization built specifically for freelancers."
               perk="Free 30-Day Trial (No Credit Card)"
-              affiliateUrl="https://freshbooks.com"
+              affiliateUrl={AFFILIATE_LINKS.freshbooks}
             />
             <AffiliateCard
               category="International Banking"
               title="Wise Business"
               description="Receive client payments from US, UK, and Europe with zero hidden exchange markup and ultra-low fees."
               perk="Zero fee on your first $600 transfer"
-              affiliateUrl="https://wise.com"
+              affiliateUrl={AFFILIATE_LINKS.wise}
             />
             <AffiliateCard
               category="Contracts & Compliance"
               title="Deel"
               description="Create compliant international freelance contracts, sign NDAs, and get paid instantly in 120+ currencies."
               perk="Instant standard contract generator"
-              affiliateUrl="https://deel.com"
+              affiliateUrl={AFFILIATE_LINKS.deel}
             />
           </div>
         </div>
