@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Download, Plus, Trash2 } from 'lucide-react';
+import { Download, Plus, Trash2, FileText } from 'lucide-react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 interface LineItem {
   id: string;
@@ -48,160 +48,203 @@ export function InvoiceGenerator() {
   const subtotal = items.reduce((acc, item) => acc + item.hours * item.rate, 0);
 
   const handleDownloadPdf = async () => {
-    if (!printRef.current) return;
-    setIsGenerating(true);
-    try {
-      const canvas = await html2canvas(printRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  if (!printRef.current) return;
+
+  setIsGenerating(true);
+
+  try {
+    const element = printRef.current;
+
+    const dataUrl = await toPng(element, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: '#ffffff',
+    });
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const imgWidth = 210;
+    const pageHeight = 297;
+
+    const img = new Image();
+
+    img.onload = () => {
+      const imgHeight = (img.height * imgWidth) / img.width;
+
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(
+        dataUrl,
+        'PNG',
+        0,
+        position,
+        imgWidth,
+        imgHeight
+      );
+
       heightLeft -= pageHeight;
 
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
+      while (heightLeft > 0) {
+        position -= pageHeight;
+
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+        pdf.addImage(
+          dataUrl,
+          'PNG',
+          0,
+          position,
+          imgWidth,
+          imgHeight
+        );
+
         heightLeft -= pageHeight;
       }
 
       pdf.save(`${invoiceNumber || 'invoice'}.pdf`);
-    } catch (err) {
-      console.error('PDF export failed:', err);
-    } finally {
+
       setIsGenerating(false);
-    }
-  };
+    };
+
+    img.onerror = () => {
+      throw new Error('Unable to load generated invoice image.');
+    };
+
+    img.src = dataUrl;
+  } catch (err) {
+    console.error('PDF export failed:', err);
+    setIsGenerating(false);
+  }
+};
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <button
-          onClick={handleDownloadPdf}
-          disabled={isGenerating}
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50"
-        >
-          <Download className="h-4 w-4" />
-          {isGenerating ? 'Generating PDF...' : 'Download Invoice PDF'}
-        </button>
-      </div>
-
+      
       {/* Printable Sheet */}
       <div
         ref={printRef}
-        className="rounded-2xl border border-zinc-200 bg-white p-8 text-zinc-900 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"
+        className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 text-slate-900 shadow-sm"
       >
-        <div className="flex flex-col justify-between gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-6 border-b border-slate-200 pb-8 sm:flex-row sm:items-start">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">INVOICE</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">
+              INVOICE
+            </span>
             <input
               type="text"
               value={invoiceNumber}
               onChange={(e) => setInvoiceNumber(e.target.value)}
-              className="mt-1 block text-2xl font-extrabold bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-blue-500 focus:outline-none"
+              className="mt-1 block w-full bg-transparent text-3xl font-black text-slate-900 border-b-2 border-transparent hover:border-slate-200 focus:border-blue-500 focus:outline-none transition-colors"
             />
           </div>
-          <div>
-            <label className="text-xs font-medium text-zinc-500">Payment Due Date</label>
+          <div className="sm:text-right">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Payment Due Date
+            </label>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="block rounded-lg border border-zinc-300 bg-transparent px-3 py-1.5 text-sm dark:border-zinc-700"
+              className="mt-2 block w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
             />
           </div>
         </div>
 
         {/* Sender & Receiver Info */}
-        <div className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2">
-          <div className="space-y-2">
-            <span className="text-xs font-semibold uppercase text-zinc-400">From (Your Details)</span>
+        <div className="grid grid-cols-1 gap-8 py-8 sm:grid-cols-2">
+          <div className="space-y-3">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              From (Your Details)
+            </span>
             <input
               type="text"
               value={senderName}
               onChange={(e) => setSenderName(e.target.value)}
               placeholder="Your Name / LLC"
-              className="w-full rounded-md border border-zinc-200 bg-transparent px-3 py-1.5 text-sm dark:border-zinc-700"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
             />
             <input
               type="email"
               value={senderEmail}
               onChange={(e) => setSenderEmail(e.target.value)}
               placeholder="Your Email"
-              className="w-full rounded-md border border-zinc-200 bg-transparent px-3 py-1.5 text-sm dark:border-zinc-700"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
             />
           </div>
 
-          <div className="space-y-2">
-            <span className="text-xs font-semibold uppercase text-zinc-400">Billed To (Client)</span>
+          <div className="space-y-3">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              Billed To (Client)
+            </span>
             <input
               type="text"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               placeholder="Client Name / Business"
-              className="w-full rounded-md border border-zinc-200 bg-transparent px-3 py-1.5 text-sm dark:border-zinc-700"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
             />
             <input
               type="email"
               value={clientEmail}
               onChange={(e) => setClientEmail(e.target.value)}
               placeholder="Client Email"
-              className="w-full rounded-md border border-zinc-200 bg-transparent px-3 py-1.5 text-sm dark:border-zinc-700"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
             />
           </div>
         </div>
 
         {/* Line Items */}
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-semibold text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-400">
+            <thead className="border-b border-slate-200 bg-slate-50/50">
               <tr>
-                <th className="py-3 px-2">Description</th>
-                <th className="py-3 px-2 w-24">Hours/Qty</th>
-                <th className="py-3 px-2 w-28">Rate ($)</th>
-                <th className="py-3 px-2 w-28">Amount</th>
-                <th className="py-3 px-2 w-12"></th>
+                <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500">Description</th>
+                <th className="py-3 px-3 w-28 text-[10px] font-black uppercase tracking-wider text-slate-500">Hours/Qty</th>
+                <th className="py-3 px-3 w-32 text-[10px] font-black uppercase tracking-wider text-slate-500">Rate ($)</th>
+                <th className="py-3 px-3 w-32 text-[10px] font-black uppercase tracking-wider text-slate-500">Amount</th>
+                <th className="py-3 px-3 w-12"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody className="divide-y divide-slate-100">
               {items.map((item) => (
-                <tr key={item.id}>
-                  <td className="py-2 px-2">
+                <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <td className="py-3 px-3">
                     <input
                       type="text"
                       value={item.description}
                       onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                      className="w-full bg-transparent border-0 focus:ring-0 p-0 text-sm"
+                      className="w-full bg-transparent border-b border-transparent hover:border-slate-200 focus:border-blue-500 focus:outline-none p-1 text-sm font-bold text-slate-900 transition-colors"
+                      placeholder="Service description"
                     />
                   </td>
-                  <td className="py-2 px-2">
+                  <td className="py-3 px-3">
                     <input
                       type="number"
                       value={item.hours}
                       onChange={(e) => updateItem(item.id, 'hours', Number(e.target.value))}
-                      className="w-full rounded border border-zinc-200 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </td>
-                  <td className="py-2 px-2">
+                  <td className="py-3 px-3">
                     <input
                       type="number"
                       value={item.rate}
                       onChange={(e) => updateItem(item.id, 'rate', Number(e.target.value))}
-                      className="w-full rounded border border-zinc-200 bg-transparent px-2 py-1 text-sm dark:border-zinc-700"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </td>
-                  <td className="py-2 px-2 font-medium">
+                  <td className="py-3 px-3 text-base font-black text-slate-900">
                     ${(item.hours * item.rate).toLocaleString()}
                   </td>
-                  <td className="py-2 px-2">
+                  <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-zinc-400 hover:text-red-500"
+                      className="text-slate-300 hover:text-red-500 transition-colors"
                       title="Delete line item"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -216,22 +259,44 @@ export function InvoiceGenerator() {
         <div className="mt-4">
           <button
             onClick={addItem}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-600 transition hover:bg-blue-100 hover:text-blue-700"
           >
             <Plus className="h-3.5 w-3.5" /> Add Line Item
           </button>
         </div>
 
-        {/* Total calculation */}
-        <div className="mt-6 flex justify-end border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          <div className="w-64 space-y-2">
-            <div className="flex justify-between text-base font-bold">
-              <span>Total Due:</span>
-              <span className="text-blue-600 dark:text-blue-400">${subtotal.toLocaleString()}</span>
+        {/* Total Calculation */}
+        <div className="mt-10 flex justify-end border-t border-slate-200 pt-6">
+          <div className="w-72 rounded-2xl bg-slate-50 p-5 border border-slate-200/60">
+            <div className="flex justify-between items-center text-lg">
+              <span className="font-bold text-slate-500">Total Due:</span>
+              <span className="text-2xl font-black text-slate-900">
+                ${subtotal.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Control Bar (Moved to the bottom) */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 shadow-inner">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
+            <FileText className="h-4 w-4" />
+          </div>
+          <span className="text-sm font-bold text-slate-800">Invoice Builder</span>
+        </div>
+        
+        <button
+          onClick={handleDownloadPdf}
+          disabled={isGenerating}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white shadow-md shadow-blue-500/20 transition hover:bg-blue-700 disabled:opacity-50 sm:w-auto"
+        >
+          <Download className="h-4 w-4" />
+          {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+        </button>
+      </div>
+
     </div>
   );
 }
