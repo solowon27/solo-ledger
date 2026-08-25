@@ -12,10 +12,8 @@ export const metadata: Metadata = {
   
   icons: {
     icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
   },
-  
+
   openGraph: {
     title: 'SoloLedger | Freelance Financial Software',
     description: 'Financial workspace and rate calculation engine for independent professionals.',
