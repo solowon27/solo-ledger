@@ -33,6 +33,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
+     crossorigin="anonymous"></script>
+      </head>
       <body className="antialiased bg-slate-100 text-slate-900 min-h-screen">
         <div className="flex min-h-screen w-full flex-col lg:flex-row">
           <Sidebar />

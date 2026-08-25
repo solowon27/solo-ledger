@@ -13,6 +13,7 @@ import {
 import { TaxCalculator } from '@/components/TaxCalculator';
 import { AffiliateCard } from '@/components/AffiliateCard';
 import { AFFILIATE_LINKS } from '@/lib/affiliates';
+import { AdBanner } from '@/components/AdBanner';
 
 export const metadata: Metadata = {
   title: 'Free Freelance Tax Calculator (2026) | Self-Employment Tax Estimator',
@@ -148,6 +149,11 @@ export default function FreeFreelanceTaxCalculatorPage() {
         <TaxCalculator />
       </section>
 
+        {/* High-Intent In-Feed Ad Banner */}
+      <section className="w-full max-w-5xl mx-auto px-6">
+        <AdBanner dataAdSlot="1234567890" />
+      </section>
+      
       {/* =====================================================
           HOW FREELANCE TAXES WORK (Educational SEO Content)
       ====================================================== */}
