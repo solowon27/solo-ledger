@@ -9,6 +9,20 @@ export const metadata: Metadata = {
     template: '%s | SoloLedger',
   },
   description: 'Financial workspace and rate calculation engine for independent professionals.',
+  
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  
+  openGraph: {
+    title: 'SoloLedger | Freelance Financial Software',
+    description: 'Financial workspace and rate calculation engine for independent professionals.',
+    url: 'https://solo-ledger.com',
+    siteName: 'SoloLedger',
+    type: 'website',
+  },
   other: {
     'impact-site-verification': 'c24b4646-597d-406e-a3cd-9f85467f7fa5',
   },
