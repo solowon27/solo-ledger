@@ -210,7 +210,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
       ========================================================== */}
       <div className="grid gap-6 lg:grid-cols-12">
         
-        {/* INPUT PANEL (Slightly darker slate-50 to pop the white inputs) */}
+        {/* INPUT PANEL */}
         <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm sm:p-7 lg:col-span-7">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700 shadow-sm">
@@ -229,94 +229,65 @@ export function Calculator({ initialValues }: CalculatorProps) {
           <div className="mt-8 space-y-8">
             {/* TARGET INCOME */}
             <div>
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <label className="text-sm font-black text-slate-800">
-                    Target take-home income
-                  </label>
-                  <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
-                    What you want to personally keep after taxes and business expenses.
-                  </p>
-                </div>
-                <div className="shrink-0 rounded-xl bg-slate-900 px-3 py-2 text-lg font-black text-white shadow-md">
-                  {currency(inputs.targetNetIncome)}
-                </div>
-              </div>
-              <input
-                type="range"
-                min="30000"
-                max="250000"
-                step="5000"
-                value={inputs.targetNetIncome}
-                onChange={(event) => updateInput("targetNetIncome", Number(event.target.value))}
-                className="mt-5 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-300 accent-blue-600"
-              />
-              <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
-                <span>$30k</span>
-                <span>$250k+</span>
+              <label className="text-sm font-black text-slate-800">
+                Target take-home income
+              </label>
+              <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
+                What you want to personally keep after taxes and business expenses.
+              </p>
+              <div className="relative mt-3">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">$</span>
+                <input
+                  type="number"
+                  value={inputs.targetNetIncome === 0 ? "" : inputs.targetNetIncome}
+                  onChange={(event) => updateInput("targetNetIncome", Number(event.target.value))}
+                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-8 pr-4 text-lg font-black text-slate-900 shadow-xs outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  placeholder="75000"
+                />
               </div>
             </div>
 
             {/* EXPENSES */}
             <div>
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <label className="flex items-center gap-1.5 text-sm font-black text-slate-800">
-                    Annual business expenses
-                    <Info className="h-3.5 w-3.5 text-slate-400" />
-                  </label>
-                  <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
-                    Software, equipment, insurance, and other operating costs.
-                  </p>
-                </div>
-                <div className="shrink-0 text-lg font-black text-slate-900">
-                  {currency(inputs.annualExpenses)}
-                </div>
-              </div>
-              <input
-                type="range"
-                min="1000"
-                max="30000"
-                step="500"
-                value={inputs.annualExpenses}
-                onChange={(event) => updateInput("annualExpenses", Number(event.target.value))}
-                className="mt-5 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-300 accent-blue-600"
-              />
-              <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
-                <span>$1k</span>
-                <span>$30k+</span>
+              <label className="flex items-center gap-1.5 text-sm font-black text-slate-800">
+                Annual business expenses
+                <Info className="h-3.5 w-3.5 text-slate-400" />
+              </label>
+              <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
+                Software, equipment, insurance, and other operating costs.
+              </p>
+              <div className="relative mt-3">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">$</span>
+                <input
+                  type="number"
+                  value={inputs.annualExpenses === 0 ? "" : inputs.annualExpenses}
+                  onChange={(event) => updateInput("annualExpenses", Number(event.target.value))}
+                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-8 pr-4 text-lg font-black text-slate-900 shadow-xs outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  placeholder="5000"
+                />
               </div>
             </div>
 
             {/* BILLABLE HOURS */}
             <div>
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <label className="flex items-center gap-1.5 text-sm font-black text-slate-800">
-                    Billable hours per week
-                    <Clock3 className="h-3.5 w-3.5 text-slate-400" />
-                  </label>
-                  <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
-                    Only count time clients realistically pay you for.
-                  </p>
-                </div>
-                <div className="shrink-0 text-lg font-black text-slate-900">
-                  {inputs.billableHoursPerWeek}
-                  <span className="ml-1 text-xs font-bold text-slate-400">hrs</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="10"
-                max="40"
-                step="1"
-                value={inputs.billableHoursPerWeek}
-                onChange={(event) => updateInput("billableHoursPerWeek", Number(event.target.value))}
-                className="mt-5 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-300 accent-blue-600"
-              />
-              <div className="mt-2 flex justify-between text-[10px] font-bold text-slate-400">
-                <span>10 hrs</span>
-                <span>40 hrs</span>
+              <label className="flex items-center gap-1.5 text-sm font-black text-slate-800">
+                Billable hours per week
+                <Clock3 className="h-3.5 w-3.5 text-slate-400" />
+              </label>
+              <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">
+                Only count time clients realistically pay you for.
+              </p>
+              <div className="relative mt-3">
+                <input
+                  type="number"
+                  value={inputs.billableHoursPerWeek === 0 ? "" : inputs.billableHoursPerWeek}
+                  onChange={(event) => updateInput("billableHoursPerWeek", Number(event.target.value))}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-lg font-black text-slate-900 shadow-xs outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  placeholder="25"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">
+                  hours
+                </span>
               </div>
               
               {/* Highlighted nested card for capacity */}
@@ -341,9 +312,10 @@ export function Calculator({ initialValues }: CalculatorProps) {
                     type="number"
                     min="0"
                     max="20"
-                    value={inputs.vacationWeeks}
+                    value={inputs.vacationWeeks === 0 ? "" : inputs.vacationWeeks}
                     onChange={(event) => updateInput("vacationWeeks", clamp(Number(event.target.value) || 0, 0, 20))}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
+                    placeholder="4"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
                     weeks
@@ -362,9 +334,10 @@ export function Calculator({ initialValues }: CalculatorProps) {
                     type="number"
                     min="0"
                     max="60"
-                    value={inputs.taxRate}
+                    value={inputs.taxRate === 0 ? "" : inputs.taxRate}
                     onChange={(event) => updateInput("taxRate", clamp(Number(event.target.value) || 0, 0, 60))}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
+                    placeholder="28"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
                     %

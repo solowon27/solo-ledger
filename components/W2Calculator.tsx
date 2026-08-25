@@ -112,32 +112,6 @@ export function W2Calculator() {
       </div>
 
       {/* =========================================================
-          SUMMARY STRIP
-      ========================================================== */}
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        <SummaryCard
-          label="W-2 salary"
-          value={money(inputs.w2Salary)}
-          icon={CircleDollarSign}
-        />
-
-        <SummaryCard
-          label="1099 annual target"
-          value={money(result.equivalent1099AnnualGross)}
-          icon={TrendingUp}
-          positive
-        />
-
-        <SummaryCard
-          label="Contractor hourly rate"
-          value={`$${result.equivalent1099HourlyRate}/hr`}
-          icon={ArrowUpRight}
-          positive
-        />
-      </div>
-
-      {/* =========================================================
           MAIN CALCULATOR
       ========================================================== */}
 
@@ -154,45 +128,38 @@ export function W2Calculator() {
 
             <div>
               <h3 className="text-sm font-black text-zinc-950">
-                Your W-2 compensation
+                Your W-2 compensation & assumptions
               </h3>
-
               <p className="mt-1 text-xs leading-5 text-zinc-500">
-                Enter the value of the employee package you are comparing
-                against a freelance opportunity.
+                Type in your exact numbers below to calculate your target rate.
               </p>
             </div>
           </div>
 
           <div className="mt-8 space-y-7">
-            {/* Salary */}
+            {/* Primary Inputs: Salary & Hours */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <NumberInput
+                label="Annual W-2 salary"
+                prefix="$"
+                value={inputs.w2Salary}
+                min={0}
+                max={1000000}
+                step={1000}
+                onChange={(value) => update("w2Salary", value)}
+              />
 
-            <RangeInput
-              label="Annual W-2 salary"
-              value={inputs.w2Salary}
-              min={40000}
-              max={300000}
-              step={5000}
-              display={money(inputs.w2Salary)}
-              onChange={(value) => update("w2Salary", value)}
-            />
-
-            {/* Billable hours */}
-
-            <RangeInput
-              label="Weekly billable capacity"
-              value={inputs.billableHoursPerWeek}
-              min={10}
-              max={40}
-              step={1}
-              display={`${inputs.billableHoursPerWeek} hrs/week`}
-              onChange={(value) =>
-                update("billableHoursPerWeek", value)
-              }
-            />
+              <NumberInput
+                label="Weekly billable capacity"
+                suffix="hrs"
+                value={inputs.billableHoursPerWeek}
+                min={1}
+                max={80}
+                onChange={(value) => update("billableHoursPerWeek", value)}
+              />
+            </div>
 
             {/* PTO / Retirement */}
-
             <div className="grid gap-4 sm:grid-cols-2">
               <NumberInput
                 label="Paid time off"
@@ -210,14 +177,11 @@ export function W2Calculator() {
                 min={0}
                 max={20}
                 step={0.5}
-                onChange={(value) =>
-                  update("match401kPercent", value)
-                }
+                onChange={(value) => update("match401kPercent", value)}
               />
             </div>
 
             {/* Benefits / Expenses */}
-
             <div className="grid gap-4 sm:grid-cols-2">
               <NumberInput
                 label="Annual health benefits"
@@ -225,10 +189,8 @@ export function W2Calculator() {
                 value={inputs.healthInsuranceValue}
                 min={0}
                 max={50000}
-                step={500}
-                onChange={(value) =>
-                  update("healthInsuranceValue", value)
-                }
+                step={100}
+                onChange={(value) => update("healthInsuranceValue", value)}
               />
 
               <NumberInput
@@ -236,20 +198,16 @@ export function W2Calculator() {
                 prefix="$"
                 value={inputs.annualBusinessExpenses}
                 min={0}
-                max={50000}
-                step={500}
-                onChange={(value) =>
-                  update("annualBusinessExpenses", value)
-                }
+                max={100000}
+                step={100}
+                onChange={(value) => update("annualBusinessExpenses", value)}
               />
             </div>
           </div>
 
           {/* Explanation */}
-
           <div className="mt-8 flex gap-3 rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-
             <p className="text-xs leading-5 text-blue-900/70">
               Salary is only one part of employee compensation. Benefits,
               retirement matching, paid leave, and the additional costs of
@@ -268,7 +226,6 @@ export function W2Calculator() {
               <div className="text-[10px] font-black uppercase tracking-[0.16em] text-emerald-700">
                 1099 equivalent
               </div>
-
               <p className="mt-1 text-xs text-zinc-500">
                 Estimated contractor requirement
               </p>
@@ -288,7 +245,6 @@ export function W2Calculator() {
               <span className="text-5xl font-black tracking-tight text-zinc-950 sm:text-6xl">
                 ${result.equivalent1099HourlyRate}
               </span>
-
               <span className="text-base font-bold text-zinc-400">
                 /hr
               </span>
@@ -303,23 +259,19 @@ export function W2Calculator() {
           </div>
 
           {/* Key numbers */}
-
           <div className="mt-8 grid grid-cols-2 gap-3">
             <ResultStat
               label="Annual target"
               value={money(result.equivalent1099AnnualGross)}
             />
-
             <ResultStat
               label="Monthly target"
               value={money(monthlyRevenue)}
             />
-
             <ResultStat
               label="Weekly target"
               value={money(weeklyRevenue)}
             />
-
             <ResultStat
               label="Billable hours"
               value={`${result.workingHoursAnnual.toLocaleString()} hrs`}
@@ -327,13 +279,11 @@ export function W2Calculator() {
           </div>
 
           {/* Comparison */}
-
           <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-4">
             <div className="flex items-center justify-between gap-4">
               <span className="text-xs text-zinc-500">
                 Employee hourly equivalent
               </span>
-
               <span className="text-sm font-black text-zinc-950">
                 {money(employeeHourlyRate)}/hr
               </span>
@@ -343,7 +293,6 @@ export function W2Calculator() {
               <span className="text-xs text-zinc-500">
                 Contractor difference
               </span>
-
               <span className="text-sm font-black text-emerald-600">
                 +{money(hourlyDifference)}/hr
               </span>
@@ -353,7 +302,6 @@ export function W2Calculator() {
           <div className="mt-5 rounded-2xl border border-emerald-100 bg-white/80 p-4">
             <div className="flex gap-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-
               <p className="text-xs leading-5 text-zinc-500">
                 This is your estimated financial break-even rate—not simply
                 your W-2 salary divided by working hours.
@@ -372,11 +320,9 @@ export function W2Calculator() {
           <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
             Compensation breakdown
           </div>
-
           <h3 className="mt-2 text-xl font-black tracking-tight text-zinc-950">
             Where the difference comes from
           </h3>
-
           <p className="mt-1 text-xs leading-5 text-zinc-500">
             Contracting replaces more than a paycheck. These are the major
             financial components included in the estimate.
@@ -467,28 +413,11 @@ export function W2Calculator() {
             </div>
 
             <ul className="mt-5 space-y-4">
-              <Tip>
-                Freelancers generally don't receive paid vacation or holidays.
-              </Tip>
-
-              <Tip>
-                You may need to purchase your own health insurance and
-                retirement benefits.
-              </Tip>
-
-              <Tip>
-                Business expenses reduce your actual take-home income.
-              </Tip>
-
-              <Tip>
-                Client hours are not necessarily the same as total hours
-                worked.
-              </Tip>
-
-              <Tip>
-                Actual tax liability varies by location and personal
-                circumstances.
-              </Tip>
+              <Tip>Freelancers generally don't receive paid vacation or holidays.</Tip>
+              <Tip>You may need to purchase your own health insurance and retirement benefits.</Tip>
+              <Tip>Business expenses reduce your actual take-home income.</Tip>
+              <Tip>Client hours are not necessarily the same as total hours worked.</Tip>
+              <Tip>Actual tax liability varies by location and personal circumstances.</Tip>
             </ul>
           </div>
         </div>
@@ -500,123 +429,12 @@ export function W2Calculator() {
 
       <div className="flex gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
-
         <p className="text-[11px] leading-5 text-zinc-500">
           This calculator provides an estimate for planning and negotiation
           purposes. It is not tax, legal, accounting, or financial advice.
           Actual compensation and tax obligations vary by employer, location,
           business structure, deductions, and individual circumstances.
         </p>
-      </div>
-    </div>
-  );
-}
-
-/* ===============================================================
-   SUMMARY CARD
-================================================================ */
-
-function SummaryCard({
-  label,
-  value,
-  icon: Icon,
-  positive = false,
-}: {
-  label: string;
-  value: string;
-  icon: React.ElementType;
-  positive?: boolean;
-}) {
-  return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div
-          className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-            positive ? "bg-emerald-50" : "bg-blue-50"
-          }`}
-        >
-          <Icon
-            className={`h-4 w-4 ${
-              positive ? "text-emerald-600" : "text-blue-600"
-            }`}
-          />
-        </div>
-
-        {positive && (
-          <span className="rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-emerald-700">
-            Target
-          </span>
-        )}
-      </div>
-
-      <div className="mt-4 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-400">
-        {label}
-      </div>
-
-      <div className="mt-1 text-xl font-black tracking-tight text-zinc-950">
-        {value}
-      </div>
-    </div>
-  );
-}
-
-/* ===============================================================
-   RANGE INPUT
-================================================================ */
-
-function RangeInput({
-  label,
-  value,
-  min,
-  max,
-  step,
-  display,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  display: string;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-4">
-        <label className="text-sm font-bold text-zinc-700">
-          {label}
-        </label>
-
-        <span className="rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-sm font-black text-zinc-950">
-          {display}
-        </span>
-      </div>
-
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(event) =>
-          onChange(Number(event.target.value))
-        }
-        className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-blue-600"
-      />
-
-      <div className="mt-1 flex justify-between text-[10px] text-zinc-400">
-        <span>
-          {min >= 1000
-            ? `$${min.toLocaleString()}`
-            : min}
-        </span>
-
-        <span>
-          {max >= 1000
-            ? `$${max.toLocaleString()}`
-            : max}
-        </span>
       </div>
     </div>
   );
@@ -666,7 +484,6 @@ function NumberInput({
           value={value}
           onChange={(event) => {
             const number = Number(event.target.value);
-
             onChange(
               Math.min(
                 max,
@@ -708,7 +525,6 @@ function ResultStat({
       <div className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
         {label}
       </div>
-
       <div className="mt-1 text-sm font-black text-zinc-950">
         {value}
       </div>
@@ -747,19 +563,10 @@ function BreakdownCard({
         >
           <Icon className="h-4 w-4" />
         </div>
-
-        <span className="text-lg font-black text-zinc-950">
-          {value}
-        </span>
+        <span className="text-lg font-black text-zinc-950">{value}</span>
       </div>
-
-      <div className="mt-4 text-sm font-black text-zinc-950">
-        {title}
-      </div>
-
-      <p className="mt-1 text-xs leading-5 text-zinc-500">
-        {description}
-      </p>
+      <div className="mt-4 text-sm font-black text-zinc-950">{title}</div>
+      <p className="mt-1 text-xs leading-5 text-zinc-500">{description}</p>
     </div>
   );
 }
@@ -768,11 +575,7 @@ function BreakdownCard({
    TIP
 ================================================================ */
 
-function Tip({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function Tip({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-3 text-xs leading-5 text-zinc-600">
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />

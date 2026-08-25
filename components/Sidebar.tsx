@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,8 +12,10 @@ import {
   X,
   Sparkles,
   ExternalLink,
+  ChevronRight,
 } from 'lucide-react';
 import { AFFILIATE_LINKS } from '@/lib/affiliates';
+import { ROLES_DATA } from '@/lib/rolesData';
 
 const navItems = [
   { name: 'Rate Calculator', href: '/', icon: Calculator, badge: 'Core' },
@@ -22,9 +24,41 @@ const navItems = [
   { name: 'Project Pricing', href: '/project-pricing', icon: BriefcaseBusiness },
 ];
 
+// Helper to group roles by their category
+const rolesByCategory = Object.entries(ROLES_DATA).reduce((acc, [key, data]) => {
+  if (!acc[data.category]) {
+    acc[data.category] = [];
+  }
+  acc[data.category].push({ key, ...data });
+  return acc;
+}, {} as Record<string, any[]>);
+
 export function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    if (mobileOpen) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [mobileOpen]);
 
   return (
     <>
@@ -39,7 +73,8 @@ export function Sidebar() {
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-          aria-label="Toggle Menu"
+          aria-label={mobileOpen ? "Close Menu" : "Open Menu"}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -50,6 +85,7 @@ export function Sidebar() {
         <div
           onClick={() => setMobileOpen(false)}
           className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs lg:hidden"
+          aria-hidden="true"
         />
       )}
 
@@ -77,17 +113,20 @@ export function Sidebar() {
           <button
             onClick={() => setMobileOpen(false)}
             className="rounded-lg p-1 text-slate-400 hover:bg-slate-200 lg:hidden"
+            aria-label="Close Menu"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Scrollable Navigation List */}
-        <div className="flex-1 overflow-y-auto px-3 py-6">
+        <div className="flex-1 overflow-y-auto px-3 py-6 scrollbar-thin scrollbar-thumb-slate-200">
+          
+          {/* Section 1: Core Tools */}
           <div className="px-3 pb-2 text-[10px] font-black tracking-wider text-slate-400 uppercase">
             Workspace Tools
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-1 mb-8">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -126,6 +165,40 @@ export function Sidebar() {
               );
             })}
           </nav>
+
+          {/* Section 2: Dynamically Grouped Rate Benchmarks */}
+          {Object.entries(rolesByCategory).map(([category, roles]) => (
+            <div key={category} className="mb-6">
+              <div className="px-3 pb-2 text-[10px] font-black tracking-wider text-slate-400 uppercase">
+                {category}
+              </div>
+              <nav className="space-y-1">
+                {roles.map((role) => {
+                  const href = `/rate/${role.key}`;
+                  const isActive = pathname === href;
+
+                  return (
+                    <Link
+                      key={role.key}
+                      href={href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`group flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+                        isActive
+                          ? 'bg-slate-200/80 text-blue-700'
+                          : 'text-slate-500 hover:bg-slate-200/50 hover:text-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 truncate">
+                        <span className="truncate">{role.shortTitle}</span>
+                      </div>
+                      {isActive && <ChevronRight className="h-3 w-3 text-blue-500" />}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
+
         </div>
 
         {/* Pinned Bottom Partner Stack */}
