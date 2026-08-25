@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Calculator,
+  Receipt,
   ArrowRightLeft,
   FileText,
   BriefcaseBusiness,
@@ -19,6 +20,7 @@ import { ROLES_DATA } from '@/lib/rolesData';
 
 const navItems = [
   { name: 'Rate Calculator', href: '/', icon: Calculator, badge: 'Core' },
+  { name: 'Tax Calculator', href: '/free-freelance-tax-calculator', icon: Receipt, badge: 'Free' },
   { name: 'W-2 vs 1099', href: '/w2-to-1099-calculator', icon: ArrowRightLeft },
   { name: 'Invoice Maker', href: '/invoice-generator', icon: FileText },
   { name: 'Project Pricing', href: '/project-pricing', icon: BriefcaseBusiness },

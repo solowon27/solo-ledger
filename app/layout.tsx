@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Financial workspace and rate calculation engine for independent professionals.',
   
   icons: {
-    icon: '/favicon.ico',
+    icon: '/public/favicon.ico',
   },
 
   openGraph: {
