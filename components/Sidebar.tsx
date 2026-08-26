@@ -67,9 +67,11 @@ export function Sidebar() {
       {/* Mobile Top Navigation Bar */}
       <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-md lg:hidden">
         <Link href="/" className="flex items-center gap-2 font-black tracking-tight text-slate-900">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs">
-            <Calculator className="h-4 w-4" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="SoloLedger"
+            className="h-7 w-7 rounded-lg object-contain"
+          />
           <span className="text-base">Solo<span className="text-blue-600">Ledger</span></span>
         </Link>
         <button
@@ -100,14 +102,16 @@ export function Sidebar() {
         {/* Brand Header */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-6">
           <Link href="/" className="flex items-center gap-2.5 font-black tracking-tight text-slate-900">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
-              <Calculator className="h-4 w-4" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="SoloLedger"
+              className="h-8 w-8 rounded-lg object-contain"
+            />
             <div>
               <div className="text-base leading-none font-black text-slate-900">
                 Solo<span className="text-blue-600">Ledger</span>
               </div>
-              <div className="text-[9px] font-bold tracking-wider text-slate-400 uppercase">
+              <div className="text-[9px] font-bold tracking-wider text-slate-400 uppercase mt-0.5">
                 Financial Suite
               </div>
             </div>

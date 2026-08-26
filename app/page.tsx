@@ -158,13 +158,7 @@ export default function HomePage() {
             </Link>
           ))}
           
-          <Link
-            href="/rates"
-            className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-slate-800"
-          >
-            View all models
-            <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+         
         </div>
       </section>
 

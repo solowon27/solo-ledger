@@ -1,0 +1,14 @@
+{
+  "name": "Solo-Ledger — Free Freelance Tax Calculator",
+  "short_name": "Solo-Ledger",
+  "description": "Free freelance tax calculator for independent workers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071934",
+  "theme_color": "#071934",
+  "icons": [
+    { "src": "/icons/apple-pwa-icon-180x180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icons/apple-pwa-icon-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/apple-pwa-icon-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

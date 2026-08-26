@@ -1,0 +1,27 @@
+// app/layout.tsx
+export const metadata = {
+  title: "Solo-Ledger — Free Freelance Tax Calculator",
+  description: "Free freelance tax calculator for independent workers.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/icons/apple-pwa-icon-180x180.png",
+  },
+  openGraph: {
+    title: "Solo-Ledger — Free Freelance Tax Calculator",
+    description: "Know your numbers. Keep more of your money.",
+    url: "https://solo-ledger.com",
+    siteName: "Solo-Ledger",
+    images: [{ url: "/og-image-1200x630.png", width: 1200, height: 630 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Solo-Ledger — Free Freelance Tax Calculator",
+    description: "Know your numbers. Keep more of your money.",
+    images: ["/og-image-1200x630.png"],
+  },
+};
