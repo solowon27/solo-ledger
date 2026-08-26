@@ -9,11 +9,9 @@ export const metadata: Metadata = {
     template: '%s | SoloLedger',
   },
   description: 'Financial workspace and rate calculation engine for independent professionals.',
-  
   icons: {
-    icon: '/public/favicon.ico',
+    icon: '/favicon.ico',
   },
-
   openGraph: {
     title: 'SoloLedger | Freelance Financial Software',
     description: 'Financial workspace and rate calculation engine for independent professionals.',
@@ -34,8 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
-     crossorigin="anonymous"></script>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="antialiased bg-slate-100 text-slate-900 min-h-screen">
         <div className="flex min-h-screen w-full flex-col lg:flex-row">
