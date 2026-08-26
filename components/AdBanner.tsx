@@ -1,13 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-
-declare global {
-  interface Window {
-    adsbygoogle: Array<Record<string, unknown>>;
-  }
-}
+import React, { useEffect, useRef } from 'react';
 
 interface AdBannerProps {
   dataAdSlot: string;
@@ -16,36 +9,65 @@ interface AdBannerProps {
   className?: string;
 }
 
+declare global {
+  interface Window {
+    adsbygoogle: Array<Record<string, unknown>>;
+  }
+}
+
 export function AdBanner({
   dataAdSlot,
   dataAdFormat = 'auto',
   dataFullWidthResponsive = true,
   className = '',
 }: AdBannerProps) {
-  const pathname = usePathname();
+  const adRef = useRef<HTMLModElement>(null);
 
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      }
-    } catch (error) {
-      console.error('AdSense banner push error:', error);
+    const adElement = adRef.current;
+
+    if (!adElement) {
+      return;
     }
-  }, [pathname]);
+
+    // AdSense adds this attribute after the <ins>
+    // has already been initialized.
+    if (adElement.getAttribute('data-adsbygoogle-status')) {
+      return;
+    }
+
+    try {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      window.adsbygoogle = window.adsbygoogle || [];
+
+      window.adsbygoogle.push({});
+    } catch (error) {
+      // An advertising failure should never break the application.
+      console.warn('AdSense banner initialization skipped:', error);
+    }
+  }, []);
 
   return (
     <div
       aria-hidden="true"
-      className={`w-full overflow-hidden text-center my-6 min-h-[90px] ${className}`}
+      className={`my-6 min-h-[90px] w-full overflow-hidden text-center ${className}`}
     >
       <ins
+        ref={adRef}
         className="adsbygoogle"
-        style={{ display: 'block' }}
-        data-ad-client="ca-pub-5417333344144399" 
+        style={{
+          display: 'block',
+          width: '100%',
+        }}
+        data-ad-client="ca-pub-5417333344144399"
         data-ad-slot={dataAdSlot}
         data-ad-format={dataAdFormat}
-        data-full-width-responsive={dataFullWidthResponsive.toString()}
+        data-full-width-responsive={
+          dataFullWidthResponsive ? 'true' : 'false'
+        }
       />
     </div>
   );

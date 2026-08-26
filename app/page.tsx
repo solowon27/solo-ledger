@@ -1,22 +1,27 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
 import {
   ArrowRight,
   ArrowRightLeft,
   BriefcaseBusiness,
-  Calculator as CalcIcon,
-  ChevronRight,
+  Calculator,
+  Check,
   FileText,
-  Sparkles,
+  ShieldCheck,
+  TrendingUp,
+  WalletCards,
 } from 'lucide-react';
-import { Calculator } from '@/components/Calculator';
+
+import { Calculator as RateCalculator } from '@/components/Calculator';
 import { AffiliateCard } from '@/components/AffiliateCard';
 import { ROLES_DATA } from '@/lib/rolesData';
-import { AFFILIATE_LINKS } from '@/lib/affiliates';
+import { AFFILIATE_PARTNERS } from '@/lib/affiliates';
 
 export const metadata: Metadata = {
-  title: 'Rate Calculator | SoloLedger',
-  description: 'Precision calculation engine for freelance hourly, daily, and project target rates.',
+  title: 'SoloLedger | Freelance Financial Planning',
+  description:
+    'Plan your freelance income, expenses, taxes, savings, and rates with a practical financial planning calculator built for independent professionals.',
 };
 
 const popularRoles = Object.values(ROLES_DATA).slice(0, 12);
@@ -25,9 +30,11 @@ export default function HomePage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'SoloLedger Freelance Rate Calculator',
+    name: 'SoloLedger',
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'All',
+    description:
+      'Financial planning tools for freelancers and independent professionals.',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -36,168 +43,503 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full bg-white text-slate-900">
+    <main className="min-h-screen bg-white text-slate-950">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
       />
 
-      {/* =====================================================
-          HERO SECTION (Centered, Grid Pattern, Overlap)
-      ====================================================== */}
-      <section className="relative w-full overflow-hidden border-b border-slate-200 bg-slate-50 px-6 pb-48 pt-24 md:px-12 lg:px-24 lg:pb-64 lg:pt-32">
-        {/* Subtle background grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        
-        {/* Soft radial glow */}
-        <div className="absolute -top-24 left-1/2 h-96 w-[40rem] -translate-x-1/2 rounded-full bg-blue-500/10 blur-[100px]"></div>
+      {/* =========================================================
+          HERO
+      ========================================================= */}
 
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-700 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5" />
-            2026 Tax Planning Engine
-          </div>
-          
-          <h1 className="text-5xl font-black tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
-            Engineer your <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">freelance rate.</span>
-          </h1>
-          
-          <p className="mt-6 max-w-2xl text-lg text-slate-600 sm:text-xl">
-            Input your financial goals, business overhead, and tax assumptions to instantly generate mathematically sound hourly, daily, and project rates.
-          </p>
-        </div>
-      </section>
-
-      {/* =====================================================
-          CALCULATOR SECTION (Negative margin for overlap)
-      ====================================================== */}
-      <section className="relative z-10 w-full px-6 md:px-12 lg:px-24">
-        {/* The negative margin pulls the calculator up over the hero section */}
-        <div className="-mt-32 mb-20 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/50 sm:p-10">
-          <Calculator />
-        </div>
-      </section>
-
-      {/* =====================================================
-          WORKSPACE TOOLS SECTION (Sleek side-by-side cards)
-      ====================================================== */}
-      <section className="w-full border-t border-slate-200 bg-slate-50 px-6 py-24 md:px-12 lg:px-24">
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900">
-              Workspace Toolkit
-            </h2>
-            <p className="mt-3 text-slate-600">
-              Purpose-built utilities for independent professionals.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Link
-            href="/w2-to-1099-calculator"
-            className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50"
-          >
-            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-              <ArrowRightLeft className="h-5 w-5" />
-            </div>
-            <h3 className="text-xl font-black text-slate-900">W-2 to 1099 Converter</h3>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              Transitioning to freelance? Calculate the true equivalent rate by factoring in the 7.65% employer FICA tax burden and lost benefits.
-            </p>
-            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-slate-900 transition-colors group-hover:text-blue-600">
-              Compare rates <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </Link>
-
-          <Link
-            href="/invoice-generator"
-            className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50"
-          >
-            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-              <FileText className="h-5 w-5" />
-            </div>
-            <h3 className="text-xl font-black text-slate-900">PDF Invoice Generator</h3>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">
-              Create, format, and export professional client invoices instantly. Everything generates locally in your browser for immediate PDF download.
-            </p>
-            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-slate-900 transition-colors group-hover:text-blue-600">
-              Draft an invoice <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* =====================================================
-          INDUSTRY BENCHMARKS (Pill Chip Design)
-      ====================================================== */}
-      <section className="w-full border-t border-slate-200 bg-white px-6 py-24 md:px-12 lg:px-24">
-        <div className="mb-10 max-w-2xl">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">
-            Industry Benchmarks
-          </h2>
-          <p className="mt-3 text-slate-600">
-            Select your niche to load a pre-configured financial model based on typical industry billable hours, expenses, and standard target incomes.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {popularRoles.map((role) => (
-            <Link
-              key={role.slug}
-              href={`/rate/${role.slug}`}
-              className="group inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-5 transition-all hover:border-blue-300 hover:bg-blue-50"
-            >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm transition-colors group-hover:bg-blue-100">
-                <BriefcaseBusiness className="h-3.5 w-3.5 text-slate-500 group-hover:text-blue-600" />
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="grid items-end gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+            <div>
+              <div className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Freelance financial planning
               </div>
-              <span className="text-sm font-bold text-slate-700 transition-colors group-hover:text-blue-800">
-                {role.title.replace('Freelance ', '')}
-              </span>
-            </Link>
-          ))}
-          
-         
+
+              <h1 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-slate-950 sm:text-5xl md:text-6xl lg:text-7xl">
+                Know what your freelance business needs to make.
+              </h1>
+
+              <p className="mt-7 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+                Build a financial plan around the income you actually want.
+                Account for expenses, taxes, vacation, and realistic billable
+                hours before deciding what to charge.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <a
+                  href="#planner"
+                  className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+                >
+                  Build your plan
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+
+                <Link
+                  href="/w2-to-1099-calculator"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                >
+                  Compare W-2 vs 1099
+                </Link>
+              </div>
+            </div>
+
+            {/* Financial snapshot */}
+            <div className="lg:justify-self-end lg:w-full lg:max-w-xl">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Example plan
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-slate-900">
+                      Independent designer
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-700">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    On target
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 divide-x divide-slate-200">
+                  <div className="p-5">
+                    <p className="text-xs text-slate-500">Annual take-home</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight">
+                      $72,000
+                    </p>
+                  </div>
+
+                  <div className="p-5">
+                    <p className="text-xs text-slate-500">Annual business costs</p>
+                    <p className="mt-2 text-2xl font-semibold tracking-tight">
+                      $9,600
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 px-5 py-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-500">
+                      Revenue allocation
+                    </span>
+                    <span className="text-xs font-semibold text-slate-700">
+                      $113,000
+                    </span>
+                  </div>
+
+                  <div className="flex h-3 overflow-hidden rounded-full bg-slate-100">
+                    <div className="w-[32%] bg-slate-950" />
+                    <div className="w-[18%] bg-blue-500" />
+                    <div className="w-[50%] bg-slate-200" />
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-3 gap-3 text-[11px] text-slate-500">
+                    <span>Take-home</span>
+                    <span>Taxes</span>
+                    <span>Expenses</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 border-t border-slate-200">
+                  <div className="p-4">
+                    <p className="text-[11px] text-slate-500">Hourly floor</p>
+                    <p className="mt-1 text-lg font-semibold">$61</p>
+                  </div>
+
+                  <div className="border-x border-slate-200 p-4">
+                    <p className="text-[11px] text-slate-500">Recommended</p>
+                    <p className="mt-1 text-lg font-semibold text-blue-700">
+                      $74
+                    </p>
+                  </div>
+
+                  <div className="p-4">
+                    <p className="text-[11px] text-slate-500">Day rate</p>
+                    <p className="mt-1 text-lg font-semibold">$592</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* =====================================================
-          RECOMMENDED INFRASTRUCTURE (Clean Cards)
-      ====================================================== */}
-      <section className="w-full border-t border-slate-200 bg-slate-50 px-6 py-24 md:px-12 lg:px-24">
-        <div className="mb-12">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">
-            Financial Infrastructure
-          </h2>
-          <p className="mt-3 text-slate-600">
-            The banking, accounting, and compliance platforms we trust to run the back-office.
-          </p>
+      {/* =========================================================
+          TRUST / PRODUCT POSITIONING
+      ========================================================= */}
+
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 divide-y divide-slate-200 px-5 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-8">
+          <div className="flex items-center gap-4 py-6 md:pr-8">
+            <Calculator className="h-5 w-5 shrink-0 text-slate-700" />
+            <div>
+              <p className="text-sm font-semibold">Plan from your target</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Start with the income you want to keep.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 py-6 md:px-8">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-slate-700" />
+            <div>
+              <p className="text-sm font-semibold">Account for the real costs</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Taxes, overhead, vacation, and non-billable time.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 py-6 md:pl-8">
+            <TrendingUp className="h-5 w-5 shrink-0 text-slate-700" />
+            <div>
+              <p className="text-sm font-semibold">Turn the plan into rates</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Get hourly, daily, and revenue targets.
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <AffiliateCard
-            category="Invoicing & Tax"
-            badge="Essential"
-            title="FreshBooks"
-            description="Automate monthly invoicing, track expenses seamlessly, and prepare for tax season without spreadsheets."
-            perk="Free 30-Day Trial"
-            affiliateUrl={AFFILIATE_LINKS?.freshbooks || 'https://freshbooks.com'}
-          />
-          <AffiliateCard
-            category="Global Business Banking"
-            title="Wise Business"
-            description="Receive client payments domestically or internationally with zero exchange markups and multi-currency accounts."
-            perk="Zero fee on first transfer"
-            affiliateUrl={AFFILIATE_LINKS?.wise || 'https://wise.com'}
-          />
-          <AffiliateCard
-            category="Compliance & Agreements"
-            title="Deel"
-            description="Generate compliant contractor agreements instantly and manage international client contracts safely."
-            perk="Free standard templates"
-            affiliateUrl={AFFILIATE_LINKS?.deel || 'https://deel.com'}
-          />
+      </section>
+
+      {/* =========================================================
+          MAIN PLANNER
+      ========================================================= */}
+
+      <section
+        id="planner"
+        className="scroll-mt-20 border-b border-slate-200 bg-white"
+      >
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+                Financial planner
+              </p>
+
+              <h2 className="text-3xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-4xl">
+                Build your freelance plan.
+              </h2>
+
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+                Tell SoloLedger what you want to earn and how you operate.
+                Your target rate is calculated from the entire financial
+                picture—not just a salary number.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              No account required
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 shadow-sm sm:p-5 lg:p-6">
+            <div className="rounded-lg border border-slate-200 bg-white">
+              <RateCalculator />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          HOW THE MODEL WORKS
+      ========================================================= */}
+
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                The model
+              </p>
+
+              <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+                Your rate is the output. Your financial plan is the starting
+                point.
+              </h2>
+
+              <p className="mt-5 max-w-lg text-sm leading-7 text-slate-600 sm:text-base">
+                A sustainable freelance rate has to support more than your
+                paycheck. SoloLedger works backward from your desired
+                take-home income and accounts for the costs of operating your
+                business.
+              </p>
+            </div>
+
+            <div className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+              <div className="grid gap-5 p-6 sm:grid-cols-[48px_1fr] sm:p-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold">
+                  01
+                </div>
+
+                <div>
+                  <h3 className="font-semibold">Start with take-home income</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Decide how much money you want available for yourself
+                    after taxes and business costs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 p-6 sm:grid-cols-[48px_1fr] sm:p-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold">
+                  02
+                </div>
+
+                <div>
+                  <h3 className="font-semibold">
+                    Add the cost of running the business
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Include software, insurance, equipment, accounting,
+                    marketing, and other annual operating expenses.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 p-6 sm:grid-cols-[48px_1fr] sm:p-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-sm font-semibold">
+                  03
+                </div>
+
+                <div>
+                  <h3 className="font-semibold">
+                    Protect time that cannot be billed
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Vacation and non-billable time reduce your available
+                    earning capacity. Your rate needs to account for that.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 p-6 sm:grid-cols-[48px_1fr] sm:p-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-sm font-semibold text-blue-700">
+                  04
+                </div>
+
+                <div>
+                  <h3 className="font-semibold">
+                    Convert the plan into a rate
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    The result gives you a minimum rate, a recommended rate,
+                    daily equivalent, and annual revenue targets.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          TOOLS
+      ========================================================= */}
+
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="mb-10">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              More tools
+            </p>
+
+            <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+              Useful numbers for the business behind your work.
+            </h2>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <Link
+              href="/w2-to-1099-calculator"
+              className="group rounded-xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg sm:p-8"
+            >
+              <div className="mb-7 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100">
+                <ArrowRightLeft className="h-5 w-5 text-slate-700" />
+              </div>
+
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <h3 className="text-xl font-semibold tracking-tight">
+                    W-2 → 1099 comparison
+                  </h3>
+
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
+                    See what freelance income would need to replace your
+                    salary after considering benefits, payroll taxes, paid
+                    time off, and other compensation.
+                  </p>
+                </div>
+
+                <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-slate-900" />
+              </div>
+            </Link>
+
+            <Link
+              href="/invoice-generator"
+              className="group rounded-xl border border-slate-200 bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg sm:p-8"
+            >
+              <div className="mb-7 flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100">
+                <FileText className="h-5 w-5 text-slate-700" />
+              </div>
+
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <h3 className="text-xl font-semibold tracking-tight">
+                    Invoice generator
+                  </h3>
+
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
+                    Create professional invoices and export them as PDFs
+                    without sending your financial information to a server.
+                  </p>
+                </div>
+
+                <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-slate-900" />
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          PROFESSIONS
+      ========================================================= */}
+
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="grid gap-10 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Starting points
+              </p>
+
+              <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+                Start with your profession.
+              </h2>
+
+              <p className="mt-4 text-sm leading-6 text-slate-600 sm:text-base">
+                Use a pre-configured model as a starting point, then adjust
+                the numbers to match your own business.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
+              {popularRoles.map((role) => (
+                <Link
+                  key={role.slug}
+                  href={`/rate/${role.slug}`}
+                  className="group flex min-h-14 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-3 transition-colors hover:border-blue-300 hover:bg-blue-50"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-100 transition-colors group-hover:bg-blue-100">
+                    <BriefcaseBusiness className="h-4 w-4 text-slate-500 group-hover:text-blue-700" />
+                  </span>
+
+                  <span className="truncate text-xs font-semibold text-slate-700 group-hover:text-blue-800 sm:text-sm">
+                    {role.shortTitle}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          INFRASTRUCTURE
+      ========================================================= */}
+
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="mb-10 max-w-2xl">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Business infrastructure
+            </p>
+
+            <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
+              Tools worth having in your stack.
+            </h2>
+
+            <p className="mt-4 text-sm leading-6 text-slate-600 sm:text-base">
+              Financial products and services that can help you operate the
+              business behind your freelance work.
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {Object.values(AFFILIATE_PARTNERS).map((partner) => (
+              <AffiliateCard
+                key={partner.id}
+                category={partner.category}
+                badge={partner.badge}
+                title={partner.name}
+                description={partner.description}
+                perk={partner.perk}
+                affiliateUrl={partner.url}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          FINAL CTA
+      ========================================================= */}
+
+      <section className="bg-slate-950">
+        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="grid items-center gap-10 md:grid-cols-[1fr_auto]">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                SoloLedger
+              </p>
+
+              <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
+                Stop guessing what to charge.
+              </h2>
+
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
+                Build a rate around your actual financial goals, operating
+                costs, and available working time.
+              </p>
+            </div>
+
+            <a
+              href="#planner"
+              className="inline-flex w-fit items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-slate-100"
+            >
+              Open planner
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-6 text-xs text-slate-500">
+            <span className="flex items-center gap-2">
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              Free to use
+            </span>
+
+            <span className="flex items-center gap-2">
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              No account required
+            </span>
+
+            <span className="flex items-center gap-2">
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              Built for independent professionals
+            </span>
+          </div>
         </div>
       </section>
     </main>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Sidebar } from '@/components/Sidebar';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://solo-ledger.com'),
@@ -42,13 +43,16 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="antialiased bg-slate-100 text-slate-900 min-h-screen">
-        <div className="flex min-h-screen w-full flex-col lg:flex-row">
-          <Sidebar />
-          <main className="flex-1 w-full min-w-0">
-            {children}
-          </main>
-        </div>
+      {/* We use slate-50 here for a bright, soft software canvas that isn't blinding white */}
+      <body className="antialiased bg-slate-50 text-slate-900 flex min-h-screen flex-col selection:bg-blue-200">
+        <Header />
+        
+        {/* main uses flex-1 to push the footer to the bottom */}
+        <main className="flex-1 w-full min-w-0 flex flex-col">
+          {children}
+        </main>
+        
+        <Footer />
       </body>
     </html>
   );

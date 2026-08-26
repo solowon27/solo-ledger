@@ -1,76 +1,30 @@
 export interface RateInputs {
-  /**
-   * Desired annual take-home income after taxes and business expenses.
-   */
+
   targetNetIncome: number;
 
-  /**
-   * Annual business expenses such as:
-   * software, equipment, insurance, accounting, marketing, etc.
-   */
-  annualExpenses: number;
 
-  /**
-   * Average number of hours per week that clients actually pay for.
-   */
+  annualExpenses: number;
   billableHoursPerWeek: number;
 
-  /**
-   * Number of weeks per year the freelancer does not expect
-   * to generate billable client revenue.
-   */
   vacationWeeks: number;
 
-  /**
-   * Estimated combined effective tax rate.
-   *
-   * Example:
-   * 28 = 28%
-   */
+
   taxRate: number;
 }
 
 export interface RateResult {
-  /**
-   * Absolute minimum hourly rate required to hit the financial target
-   * based strictly on the supplied assumptions.
-   */
+
   minHourlyRate: number;
 
-  /**
-   * Recommended hourly rate including the built-in business cushion.
-   */
   recommendedHourlyRate: number;
 
-  /**
-   * Recommended 8-hour day rate.
-   */
   dayRate: number;
 
-  /**
-   * Gross annual revenue required before taxes and expenses.
-   */
   annualGrossTarget: number;
-
-  /**
-   * Total number of client-billable hours expected during the year.
-   */
-  totalAnnualBillableHours: number;
-
-  /**
-   * Desired monthly take-home income.
-   */
-  monthlyTakeHome: number;
-
-  /**
-   * Estimated annual taxes based on the effective tax rate.
-   */
-  estimatedAnnualTaxes: number;
-
-  /**
-   * Estimated monthly gross revenue target.
-   */
-  monthlyGrossTarget: number;
+ totalAnnualBillableHours: number;
+ monthlyTakeHome: number;
+ estimatedAnnualTaxes: number;
+monthlyGrossTarget: number;
 
   /**
    * Estimated weekly gross revenue target during working weeks.
