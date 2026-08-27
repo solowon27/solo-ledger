@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { Calculator } from "@/components/Calculator";
 import {
-  COUNTRIES,
   getCountryBySlug,
   getCountrySlugs,
 } from "@/lib/countries";
@@ -15,21 +14,17 @@ interface CountryPageProps {
 }
 
 export function generateStaticParams() {
-  return getCountrySlugs().map(
-    (country) => ({
-      country,
-    })
-  );
+  return getCountrySlugs().map((country) => ({
+    country,
+  }));
 }
 
 export async function generateMetadata({
   params,
 }: CountryPageProps): Promise<Metadata> {
-  const { country: slug } =
-    await params;
+  const { country: slug } = await params;
 
-  const country =
-    getCountryBySlug(slug);
+  const country = getCountryBySlug(slug);
 
   if (!country) {
     return {};
@@ -37,17 +32,13 @@ export async function generateMetadata({
 
   return {
     title: country.seo.title,
-    description:
-      country.seo.description,
-
+    description: country.seo.description,
     alternates: {
       canonical: `/${country.slug}/freelance-calculator`,
     },
-
     openGraph: {
       title: country.seo.title,
-      description:
-        country.seo.description,
+      description: country.seo.description,
       type: "website",
     },
   };
@@ -56,11 +47,9 @@ export async function generateMetadata({
 export default async function CountryCalculatorPage({
   params,
 }: CountryPageProps) {
-  const { country: slug } =
-    await params;
+  const { country: slug } = await params;
 
-  const country =
-    getCountryBySlug(slug);
+  const country = getCountryBySlug(slug);
 
   if (!country) {
     notFound();
