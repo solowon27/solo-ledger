@@ -116,15 +116,17 @@ export function Calculator({
 
   const results = useMemo(
     () =>
-      computeFreelanceRate(
-        inputs,
-        {
-          costOfLivingIndex:
-            country.costOfLivingIndex,
-          applyCostOfLivingAdjustment: true,
-        }
-      ),
-    [inputs, country]
+  computeFreelanceRate(
+    {
+      ...inputs,
+      taxRate: country.defaultTaxRate,
+    },
+    {
+      costOfLivingIndex: country.costOfLivingIndex,
+      applyCostOfLivingAdjustment: true,
+    }
+  ),
+[inputs, country]
   );
 
   const presets = useMemo(

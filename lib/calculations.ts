@@ -133,50 +133,49 @@ export function computeFreelanceRate(
   /**
    * Base safety margin.
    */
-  const safetyMultiplier = 1.2;
+ const safetyMultiplier = 1.2;
 
-  const safetyAdjustedRate =
-    minHourlyRate * safetyMultiplier;
+const safetyAdjustedRate =
+  minHourlyRate * safetyMultiplier;
 
-  /**
-   * Local market adjustment.
-   *
-   * 100 = no adjustment.
-   * 85 = 15% lower.
-   * 120 = 20% higher.
-   */
-  const rawCostOfLivingIndex =
-    Number(options.costOfLivingIndex) || 100;
+// Local market adjustment
+const rawCostOfLivingIndex =
+  Number(options.costOfLivingIndex) || 100;
 
-  const costOfLivingIndex = clamp(
-    rawCostOfLivingIndex,
-    50,
-    200
-  );
+const costOfLivingIndex = clamp(
+  rawCostOfLivingIndex,
+  50,
+  200
+);
 
-  const applyCostOfLivingAdjustment =
-    options.applyCostOfLivingAdjustment ?? true;
+const applyCostOfLivingAdjustment =
+  options.applyCostOfLivingAdjustment ?? true;
 
-  const costOfLivingAdjustment =
-    applyCostOfLivingAdjustment
-      ? costOfLivingIndex / 100
-      : 1;
+const costOfLivingAdjustment =
+  applyCostOfLivingAdjustment
+    ? costOfLivingIndex / 100
+    : 1;
 
-  const recommendedHourlyRate = roundUp(
-    safetyAdjustedRate *
-      costOfLivingAdjustment
-  );
+// Recommended rate after local-market adjustment
+const recommendedHourlyRate = roundUp(
+  safetyAdjustedRate * costOfLivingAdjustment
+);
 
-  const recommendedAnnualRevenue = roundNearest(
-    recommendedHourlyRate *
-      totalAnnualBillableHours
-  );
+// Revenue based on final recommended rate
+const recommendedAnnualRevenue = roundNearest(
+  recommendedHourlyRate * totalAnnualBillableHours
+);
 
-  const annualSafetyMargin = Math.max(
-    0,
-    recommendedAnnualRevenue -
-      roundNearest(grossNeeded)
-  );
+// Safety margin BEFORE local-market adjustment
+const safetyAnnualRevenue = roundNearest(
+  safetyAdjustedRate * totalAnnualBillableHours
+);
+
+const annualSafetyMargin = Math.max(
+  0,
+  safetyAnnualRevenue -
+    roundNearest(grossNeeded)
+);
 
   const dayRate = roundUp(
     recommendedHourlyRate * 8
