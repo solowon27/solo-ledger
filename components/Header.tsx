@@ -20,7 +20,6 @@ const navItems = [
   { name: 'W-2 vs 1099', href: '/w2-to-1099-calculator', icon: ArrowRightLeft },
   { name: 'Project Pricing', href: '/project-pricing', icon: Target },
   { name: 'Invoice Maker', href: '/invoice-generator', icon: FileText },
-  { name: 'free-freelance-tax-calculator', href: '/free-freelance-tax-calculator', icon: BriefcaseBusiness },
 ];
 
 export function Header() {

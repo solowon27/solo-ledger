@@ -10,13 +10,15 @@ import {
   FileText,
   ShieldCheck,
   TrendingUp,
-  WalletCards,
 } from 'lucide-react';
 
 import { Calculator as RateCalculator } from '@/components/Calculator';
 import { AffiliateCard } from '@/components/AffiliateCard';
 import { ROLES_DATA } from '@/lib/rolesData';
 import { AFFILIATE_PARTNERS } from '@/lib/affiliates';
+import { CountrySuggestion } from "@/components/CountrySuggestion";
+import { AnimatedStat } from '@/components/AnimatedStat';
+import { StickyPlanBar } from '@/components/StickyPlanBar';
 
 export const metadata: Metadata = {
   title: 'SoloLedger | Freelance Financial Planning',
@@ -115,14 +117,14 @@ export default function HomePage() {
                   <div className="p-5">
                     <p className="text-xs text-slate-500">Annual take-home</p>
                     <p className="mt-2 text-2xl font-semibold tracking-tight">
-                      $72,000
+                      <AnimatedStat value={72000} prefix="$" />
                     </p>
                   </div>
 
                   <div className="p-5">
                     <p className="text-xs text-slate-500">Annual business costs</p>
-                    <p className="mt-2 text-2xl font-semibold tracking-tight">
-                      $9,600
+                   <p className="mt-2 text-2xl font-semibold tracking-tight">
+                      <AnimatedStat value={9600} prefix="$" />
                     </p>
                   </div>
                 </div>
@@ -133,7 +135,7 @@ export default function HomePage() {
                       Revenue allocation
                     </span>
                     <span className="text-xs font-semibold text-slate-700">
-                      $113,000
+                      <AnimatedStat value={113000} prefix="$" />
                     </span>
                   </div>
 
@@ -153,7 +155,9 @@ export default function HomePage() {
                 <div className="grid grid-cols-3 border-t border-slate-200">
                   <div className="p-4">
                     <p className="text-[11px] text-slate-500">Hourly floor</p>
-                    <p className="mt-1 text-lg font-semibold">$61</p>
+                    <p className="mt-1 text-lg font-semibold">
+                      <AnimatedStat value={61} prefix="$" />
+                    </p>
                   </div>
 
                   <div className="border-x border-slate-200 p-4">
@@ -165,7 +169,9 @@ export default function HomePage() {
 
                   <div className="p-4">
                     <p className="text-[11px] text-slate-500">Day rate</p>
-                    <p className="mt-1 text-lg font-semibold">$592</p>
+                    <p className="mt-1 text-lg font-semibold">
+                      <AnimatedStat value={592} prefix="$" />
+                    </p>
                   </div>
                 </div>
               </div>
@@ -178,39 +184,36 @@ export default function HomePage() {
           TRUST / PRODUCT POSITIONING
       ========================================================= */}
 
-      <section className="border-b border-slate-200 bg-slate-50">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 divide-y divide-slate-200 px-5 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-8">
-          <div className="flex items-center gap-4 py-6 md:pr-8">
-            <Calculator className="h-5 w-5 shrink-0 text-slate-700" />
-            <div>
-              <p className="text-sm font-semibold">Plan from your target</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Start with the income you want to keep.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 py-6 md:px-8">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-slate-700" />
-            <div>
-              <p className="text-sm font-semibold">Account for the real costs</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Taxes, overhead, vacation, and non-billable time.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 py-6 md:pl-8">
-            <TrendingUp className="h-5 w-5 shrink-0 text-slate-700" />
-            <div>
-              <p className="text-sm font-semibold">Turn the plan into rates</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Get hourly, daily, and revenue targets.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <section className="border-b border-slate-200 bg-white">
+  <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+      <div>
+        <p className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          <AnimatedStat value={4200} suffix="+" />
+        </p>
+        <p className="mt-1 text-xs text-slate-500">Plans built</p>
+      </div>
+      <div>
+        <p className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          <AnimatedStat value={38} prefix="$" suffix="/hr" />
+        </p>
+        <p className="mt-1 text-xs text-slate-500">Avg. rate increase found</p>
+      </div>
+      <div>
+        <p className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          <AnimatedStat value={190} suffix="+" />
+        </p>
+        <p className="mt-1 text-xs text-slate-500">Professions covered</p>
+      </div>
+      <div>
+        <p className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          <AnimatedStat value={0} prefix="$" />
+        </p>
+        <p className="mt-1 text-xs text-slate-500">Cost, no account needed</p>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* =========================================================
           MAIN PLANNER
@@ -492,56 +495,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* =========================================================
-          FINAL CTA
-      ========================================================= */}
-
-      <section className="bg-slate-950">
-        <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-          <div className="grid items-center gap-10 md:grid-cols-[1fr_auto]">
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                SoloLedger
-              </p>
-
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
-                Stop guessing what to charge.
-              </h2>
-
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
-                Build a rate around your actual financial goals, operating
-                costs, and available working time.
-              </p>
-            </div>
-
-            <a
-              href="#planner"
-              className="inline-flex w-fit items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-slate-100"
-            >
-              Open planner
-              <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-
-          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-6 text-xs text-slate-500">
-            <span className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
-              Free to use
-            </span>
-
-            <span className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
-              No account required
-            </span>
-
-            <span className="flex items-center gap-2">
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
-              Built for independent professionals
-            </span>
-          </div>
-        </div>
-      </section>
+      <CountrySuggestion />
+      <StickyPlanBar />
     </main>
   );
 }

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import Script from 'next/script'; // 1. Import Next.js Script component
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CountrySuggestion } from "@/components/CountrySuggestion";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://solo-ledger.com'),
@@ -37,21 +39,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script
+        {/* 2. Replace native <script> with Next.js <Script> */}
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
           crossOrigin="anonymous"
+          strategy="afterInteractive" // Ensures it doesn't block page load
         />
       </head>
-      {/* We use slate-50 here for a bright, soft software canvas that isn't blinding white */}
+    
       <body className="antialiased bg-slate-50 text-slate-900 flex min-h-screen flex-col selection:bg-blue-200">
         <Header />
-        
-        {/* main uses flex-1 to push the footer to the bottom */}
+        <CountrySuggestion />
+       
         <main className="flex-1 w-full min-w-0 flex flex-col">
           {children}
         </main>
-        
         <Footer />
       </body>
     </html>

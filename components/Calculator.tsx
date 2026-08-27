@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -24,8 +25,14 @@ import {
   RateInputs,
 } from "@/lib/calculations";
 
+import {
+  CountryConfig,
+  DEFAULT_COUNTRY,
+} from "@/lib/countries";
+
 interface CalculatorProps {
   initialValues?: Partial<RateInputs>;
+  country?: CountryConfig;
 }
 
 type InputKey =
@@ -35,68 +42,134 @@ type InputKey =
   | "vacationWeeks"
   | "taxRate";
 
-const DEFAULT_VALUES: RateInputs = {
+const BASE_DEFAULT_VALUES: RateInputs = {
   targetNetIncome: 75000,
   annualExpenses: 5000,
   billableHoursPerWeek: 25,
   vacationWeeks: 4,
-  taxRate: 28,
+  taxRate: DEFAULT_COUNTRY.defaultTaxRate,
 };
 
-const currency = (value: number) =>
-  `$${Math.round(Math.max(0, value)).toLocaleString("en-US")}`;
+function getDefaultValues(
+  country: CountryConfig
+): RateInputs {
+  return {
+    ...BASE_DEFAULT_VALUES,
+    taxRate: country.defaultTaxRate,
+  };
+}
+
+function formatCurrency(
+  value: number,
+  country: CountryConfig
+) {
+  return new Intl.NumberFormat(country.locale, {
+    style: "currency",
+    currency: country.currency,
+    maximumFractionDigits: 0,
+  }).format(Math.max(0, value));
+}
 
 const numberFormat = (value: number) =>
-  Math.round(Math.max(0, value)).toLocaleString("en-US");
+  Math.round(
+    Math.max(0, value)
+  ).toLocaleString("en-US");
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
+const clamp = (
+  value: number,
+  min: number,
+  max: number
+) =>
+  Math.min(
+    Math.max(value, min),
+    max
+  );
 
 const percent = (value: number) =>
-  `${Math.round(Math.max(0, Math.min(100, value)))}%`;
+  `${Math.round(
+    Math.max(
+      0,
+      Math.min(100, value)
+    )
+  )}%`;
 
-const presets = [
-  {
-    name: "Lean",
-    description: "Lower overhead and lighter workload",
-    income: 50000,
-    expenses: 3000,
-    hours: 20,
-    vacation: 4,
-    tax: 25,
-  },
-  {
-    name: "Balanced",
-    description: "A practical full-time freelance plan",
-    income: 75000,
-    expenses: 5000,
-    hours: 25,
-    vacation: 4,
-    tax: 28,
-  },
-  {
-    name: "Growth",
-    description: "Higher income with more billable capacity",
-    income: 120000,
-    expenses: 10000,
-    hours: 30,
-    vacation: 5,
-    tax: 30,
-  },
-];
+export function Calculator({
+  initialValues,
+  country = DEFAULT_COUNTRY,
+}: CalculatorProps) {
+  const defaultValues = useMemo(
+    () => getDefaultValues(country),
+    [country]
+  );
 
-export function Calculator({ initialValues }: CalculatorProps) {
-  const [inputs, setInputs] = useState<RateInputs>({
-    ...DEFAULT_VALUES,
-    ...initialValues,
-  });
+  const [inputs, setInputs] =
+    useState<RateInputs>({
+      ...defaultValues,
+      ...initialValues,
+    });
 
-  const [activePreset, setActivePreset] = useState<number | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const [activePreset, setActivePreset] =
+    useState<number | null>(null);
 
-  const results = computeFreelanceRate(inputs);
+  const [showDetails, setShowDetails] =
+    useState(false);
 
-  const updateInput = (key: InputKey, value: number) => {
+  const results = useMemo(
+    () =>
+      computeFreelanceRate(
+        inputs,
+        {
+          costOfLivingIndex:
+            country.costOfLivingIndex,
+          applyCostOfLivingAdjustment: true,
+        }
+      ),
+    [inputs, country]
+  );
+
+  const presets = useMemo(
+    () => [
+      {
+        name: "Lean",
+        description:
+          "Lower overhead and lighter workload",
+        income: 50000,
+        expenses: 3000,
+        hours: 20,
+        vacation: 4,
+        tax: country.defaultTaxRate,
+      },
+      {
+        name: "Balanced",
+        description:
+          "A practical full-time freelance plan",
+        income: 75000,
+        expenses: 5000,
+        hours: 25,
+        vacation: 4,
+        tax: country.defaultTaxRate,
+      },
+      {
+        name: "Growth",
+        description:
+          "Higher income with more billable capacity",
+        income: 120000,
+        expenses: 10000,
+        hours: 30,
+        vacation: 5,
+        tax: country.defaultTaxRate,
+      },
+    ],
+    [country.defaultTaxRate]
+  );
+
+  const money = (value: number) =>
+    formatCurrency(value, country);
+
+  const updateInput = (
+    key: InputKey,
+    value: number
+  ) => {
     setInputs((current) => ({
       ...current,
       [key]: value,
@@ -107,7 +180,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
   const resetCalculator = () => {
     setInputs({
-      ...DEFAULT_VALUES,
+      ...defaultValues,
       ...initialValues,
     });
 
@@ -129,52 +202,74 @@ export function Calculator({ initialValues }: CalculatorProps) {
   };
 
   const metrics = useMemo(() => {
-    const workingWeeks = Math.max(1, 52 - inputs.vacationWeeks);
+    const workingWeeks = Math.max(
+      1,
+      52 - inputs.vacationWeeks
+    );
 
     const annualBillableHours =
-      inputs.billableHoursPerWeek * workingWeeks;
+      inputs.billableHoursPerWeek *
+      workingWeeks;
 
-    const nonBillableHoursPerWeek = Math.max(
-      0,
-      40 - inputs.billableHoursPerWeek
-    );
+    const nonBillableHoursPerWeek =
+      Math.max(
+        0,
+        40 -
+          inputs.billableHoursPerWeek
+      );
 
     const billableShare =
       inputs.billableHoursPerWeek > 0
-        ? (inputs.billableHoursPerWeek / 40) * 100
+        ? (inputs.billableHoursPerWeek /
+            40) *
+          100
         : 0;
 
-    const minimumWeeklyRevenue = results.weeklyGrossTarget;
+    const minimumWeeklyRevenue =
+      results.weeklyGrossTarget;
 
     const recommendedWeeklyRevenue =
-      results.recommendedAnnualRevenue / workingWeeks;
+      results.recommendedAnnualRevenue /
+      workingWeeks;
 
-    const minimumMonthlyRevenue = results.monthlyGrossTarget;
+    const minimumMonthlyRevenue =
+      results.monthlyGrossTarget;
 
     const recommendedMonthlyRevenue =
       results.recommendedMonthlyRevenue;
 
-    const taxAmount = results.estimatedAnnualTaxes;
-    const expenseAmount = inputs.annualExpenses;
-    const netAmount = inputs.targetNetIncome;
+    const taxAmount =
+      results.estimatedAnnualTaxes;
+
+    const expenseAmount =
+      inputs.annualExpenses;
+
+    const netAmount =
+      inputs.targetNetIncome;
 
     const totalAllocation = Math.max(
       1,
-      taxAmount + expenseAmount + netAmount
+      taxAmount +
+        expenseAmount +
+        netAmount
     );
 
     const netPercent =
-      (netAmount / totalAllocation) * 100;
+      (netAmount / totalAllocation) *
+      100;
 
     const taxPercent =
-      (taxAmount / totalAllocation) * 100;
+      (taxAmount / totalAllocation) *
+      100;
 
     const expensePercent =
-      (expenseAmount / totalAllocation) * 100;
+      (expenseAmount / totalAllocation) *
+      100;
 
     const effectiveRate =
       annualBillableHours > 0
-        ? results.recommendedAnnualRevenue / annualBillableHours
+        ? results.recommendedAnnualRevenue /
+          annualBillableHours
         : 0;
 
     const safetyMarginPercent =
@@ -205,8 +300,11 @@ export function Calculator({ initialValues }: CalculatorProps) {
   }, [inputs, results]);
 
   const planStatus = useMemo(() => {
-    const hours = inputs.billableHoursPerWeek;
-    const income = inputs.targetNetIncome;
+    const hours =
+      inputs.billableHoursPerWeek;
+
+    const income =
+      inputs.targetNetIncome;
 
     if (hours <= 15) {
       return {
@@ -216,7 +314,10 @@ export function Calculator({ initialValues }: CalculatorProps) {
       };
     }
 
-    if (hours <= 30 && income <= 150000) {
+    if (
+      hours <= 30 &&
+      income <= 150000
+    ) {
       return {
         label: "Balanced plan",
         description:
@@ -241,15 +342,11 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
   return (
     <div className="space-y-8">
-      {/* =========================================================
-          HEADER
-      ========================================================== */}
-
       <section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-blue-700">
             <CalculatorIcon className="h-3.5 w-3.5" />
-            Freelance financial planner
+            {country.name} freelance financial planner
           </div>
 
           <h2 className="text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl lg:text-4xl">
@@ -273,10 +370,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
         </button>
       </section>
 
-      {/* =========================================================
-          QUICK SCENARIOS
-      ========================================================== */}
-
       <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -296,13 +389,16 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {presets.map((preset, index) => {
-            const active = activePreset === index;
+            const active =
+              activePreset === index;
 
             return (
               <button
                 key={preset.name}
                 type="button"
-                onClick={() => applyPreset(index)}
+                onClick={() =>
+                  applyPreset(index)
+                }
                 className={[
                   "group rounded-2xl border p-4 text-left transition-all",
                   active
@@ -339,7 +435,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
                       : "text-zinc-500",
                   ].join(" ")}
                 >
-                  {currency(preset.income)} take-home ·{" "}
+                  {money(preset.income)} take-home ·{" "}
                   {preset.hours} billable hrs/wk
                 </div>
 
@@ -352,13 +448,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
         </div>
       </section>
 
-      {/* =========================================================
-          MAIN CALCULATOR
-      ========================================================== */}
-
       <section className="grid gap-6 lg:grid-cols-12">
-        {/* INPUTS */}
-
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:col-span-7 sm:p-7">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
@@ -381,7 +471,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
             <InputField
               label="Target take-home income"
               description="What you want to personally keep after estimated taxes and business expenses."
-              prefix="$"
+              prefix={country.currencySymbol}
               value={inputs.targetNetIncome}
               placeholder="75000"
               onChange={(value) =>
@@ -395,7 +485,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
             <InputField
               label="Annual business expenses"
               description="Software, equipment, insurance, accounting, marketing, and other operating costs."
-              prefix="$"
+              prefix={country.currencySymbol}
               value={inputs.annualExpenses}
               placeholder="5000"
               onChange={(value) =>
@@ -406,8 +496,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
               }
               info
             />
-
-            {/* BILLABLE HOURS */}
 
             <div>
               <div className="flex items-center gap-2">
@@ -469,7 +557,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
                 <MiniMetric
                   label="Billable share"
-                  value={percent(metrics.billableShare)}
+                  value={percent(
+                    metrics.billableShare
+                  )}
                   suffix=""
                 />
               </div>
@@ -489,8 +579,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
                 </p>
               </div>
             </div>
-
-            {/* VACATION + TAX */}
 
             <div className="grid gap-5 sm:grid-cols-2">
               <NumberPlanningInput
@@ -512,10 +600,12 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
               <NumberPlanningInput
                 label="Estimated tax rate"
-                description="Percentage reserved for estimated taxes."
+                description={`Starting estimate for ${country.name}. Adjust this based on your own situation.`}
                 icon={Receipt}
                 value={inputs.taxRate}
-                placeholder="28"
+                placeholder={String(
+                  country.defaultTaxRate
+                )}
                 suffix="%"
                 min={0}
                 max={95}
@@ -540,8 +630,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
           </div>
         </div>
 
-        {/* RESULT */}
-
         <div className="rounded-3xl border border-blue-100 bg-gradient-to-b from-blue-50 to-white p-6 shadow-sm lg:col-span-5 sm:p-7">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -565,38 +653,43 @@ export function Calculator({ initialValues }: CalculatorProps) {
             </p>
 
             <div className="mt-1 text-5xl font-black tracking-tight text-zinc-950 sm:text-6xl">
-              {currency(results.recommendedAnnualRevenue)}
+              {money(
+                results.recommendedAnnualRevenue
+              )}
             </div>
 
             <p className="mt-3 max-w-md text-xs leading-5 text-zinc-500">
               Revenue target designed to support your income goal while
-              adding a 20% operating safety margin.
+              adding a 20% operating safety margin and local market
+              adjustment.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-3">
             <ResultStat
               label="Minimum required"
-              value={currency(results.annualGrossTarget)}
+              value={money(
+                results.annualGrossTarget
+              )}
             />
 
             <ResultStat
               label="Safety margin"
-              value={`+${currency(
+              value={`+${money(
                 results.annualSafetyMargin
               )}`}
             />
 
             <ResultStat
               label="Monthly target"
-              value={currency(
+              value={money(
                 results.recommendedMonthlyRevenue
               )}
             />
 
             <ResultStat
               label="Weekly target"
-              value={currency(
+              value={money(
                 metrics.recommendedWeeklyRevenue
               )}
             />
@@ -611,7 +704,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <DarkLightStat
                 icon={DollarSign}
                 label="Hourly"
-                value={`$${results.recommendedHourlyRate}`}
+                value={money(
+                  results.recommendedHourlyRate
+                )}
                 note="Recommended"
                 featured
               />
@@ -619,14 +714,16 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <DarkLightStat
                 icon={BriefcaseBusiness}
                 label="Day rate"
-                value={currency(results.dayRate)}
+                value={money(
+                  results.dayRate
+                )}
                 note="8 billable hours"
               />
 
               <DarkLightStat
                 icon={Wallet}
                 label="Monthly"
-                value={currency(
+                value={money(
                   results.recommendedMonthlyRevenue
                 )}
                 note="Revenue target"
@@ -635,7 +732,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <DarkLightStat
                 icon={TrendingUp}
                 label="Effective rate"
-                value={currency(metrics.effectiveRate)}
+                value={money(
+                  metrics.effectiveRate
+                )}
                 note="Annual capacity"
               />
             </div>
@@ -659,10 +758,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
         </div>
       </section>
 
-      {/* =========================================================
-          FINANCIAL SNAPSHOT
-      ========================================================== */}
-
       <section>
         <div className="mb-5">
           <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
@@ -683,14 +778,16 @@ export function Calculator({ initialValues }: CalculatorProps) {
           <MetricCard
             icon={Wallet}
             label="Target take-home"
-            value={currency(inputs.targetNetIncome)}
+            value={money(
+              inputs.targetNetIncome
+            )}
             accent="emerald"
           />
 
           <MetricCard
             icon={TrendingUp}
             label="Recommended annual"
-            value={currency(
+            value={money(
               results.recommendedAnnualRevenue
             )}
             accent="blue"
@@ -699,7 +796,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
           <MetricCard
             icon={DollarSign}
             label="Recommended monthly"
-            value={currency(
+            value={money(
               results.recommendedMonthlyRevenue
             )}
             accent="blue"
@@ -715,10 +812,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
           />
         </div>
       </section>
-
-      {/* =========================================================
-          REVENUE ALLOCATION
-      ========================================================== */}
 
       <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -745,21 +838,21 @@ export function Calculator({ initialValues }: CalculatorProps) {
         <div className="mt-7 space-y-5">
           <RevenueBar
             label="Your take-home income"
-            value={currency(metrics.netAmount)}
+            value={money(metrics.netAmount)}
             percentage={metrics.netPercent}
             barClass="bg-blue-500"
           />
 
           <RevenueBar
             label="Estimated taxes"
-            value={currency(metrics.taxAmount)}
+            value={money(metrics.taxAmount)}
             percentage={metrics.taxPercent}
             barClass="bg-amber-500"
           />
 
           <RevenueBar
             label="Business expenses"
-            value={currency(metrics.expenseAmount)}
+            value={money(metrics.expenseAmount)}
             percentage={metrics.expensePercent}
             barClass="bg-indigo-500"
           />
@@ -768,27 +861,23 @@ export function Calculator({ initialValues }: CalculatorProps) {
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           <AllocationCard
             label="Take-home"
-            value={currency(metrics.netAmount)}
+            value={money(metrics.netAmount)}
             percentage={metrics.netPercent}
           />
 
           <AllocationCard
             label="Taxes"
-            value={currency(metrics.taxAmount)}
+            value={money(metrics.taxAmount)}
             percentage={metrics.taxPercent}
           />
 
           <AllocationCard
             label="Expenses"
-            value={currency(metrics.expenseAmount)}
+            value={money(metrics.expenseAmount)}
             percentage={metrics.expensePercent}
           />
         </div>
       </section>
-
-      {/* =========================================================
-          WORKLOAD + SAFETY
-      ========================================================== */}
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-7">
@@ -833,7 +922,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
 
             <PlanningStat
               label="Billable share"
-              value={percent(metrics.billableShare)}
+              value={percent(
+                metrics.billableShare
+              )}
             />
           </div>
 
@@ -867,8 +958,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
           </div>
         </div>
 
-        {/* SAFETY */}
-
         <div className="rounded-3xl bg-zinc-950 p-6 text-white shadow-sm sm:p-7">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
@@ -887,7 +976,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
           </div>
 
           <div className="mt-7 text-4xl font-black tracking-tight">
-            +{currency(results.annualSafetyMargin)}
+            +{money(
+              results.annualSafetyMargin
+            )}
           </div>
 
           <p className="mt-3 text-xs leading-5 text-zinc-400">
@@ -910,7 +1001,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
               </span>
 
               <span className="text-sm font-black text-blue-400">
-                {percent(metrics.safetyMarginPercent)}
+                {percent(
+                  metrics.safetyMarginPercent
+                )}
               </span>
             </div>
 
@@ -929,10 +1022,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
         </div>
       </section>
 
-      {/* =========================================================
-          REVENUE TARGETS
-      ========================================================== */}
-
       <section>
         <div className="mb-5">
           <div className="text-[10px] font-black uppercase tracking-[0.16em] text-blue-600">
@@ -947,28 +1036,32 @@ export function Calculator({ initialValues }: CalculatorProps) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <TargetCard
             label="Minimum monthly"
-            value={currency(metrics.minimumMonthlyRevenue)}
+            value={money(
+              metrics.minimumMonthlyRevenue
+            )}
             note="Required to support your goal"
           />
 
           <TargetCard
             label="Recommended monthly"
-            value={currency(
+            value={money(
               metrics.recommendedMonthlyRevenue
             )}
-            note="Includes safety margin"
+            note="Includes safety margin and local market adjustment"
             featured
           />
 
           <TargetCard
             label="Minimum weekly"
-            value={currency(metrics.minimumWeeklyRevenue)}
+            value={money(
+              metrics.minimumWeeklyRevenue
+            )}
             note="During working weeks"
           />
 
           <TargetCard
             label="Recommended weekly"
-            value={currency(
+            value={money(
               metrics.recommendedWeeklyRevenue
             )}
             note="During working weeks"
@@ -977,15 +1070,13 @@ export function Calculator({ initialValues }: CalculatorProps) {
         </div>
       </section>
 
-      {/* =========================================================
-          CALCULATION DETAILS
-      ========================================================== */}
-
       <section className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
         <button
           type="button"
           onClick={() =>
-            setShowDetails((current) => !current)
+            setShowDetails(
+              (current) => !current
+            )
           }
           className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"
         >
@@ -1003,7 +1094,9 @@ export function Calculator({ initialValues }: CalculatorProps) {
             <ChevronDown
               className={[
                 "h-4 w-4 text-zinc-400 transition-transform",
-                showDetails ? "rotate-180" : "",
+                showDetails
+                  ? "rotate-180"
+                  : "",
               ].join(" ")}
             />
           </div>
@@ -1015,7 +1108,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <FormulaCard
                 number="01"
                 title="Start with your goal"
-                text={`Your target take-home income is ${currency(
+                text={`Your target take-home income is ${money(
                   inputs.targetNetIncome
                 )}.`}
               />
@@ -1023,7 +1116,7 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <FormulaCard
                 number="02"
                 title="Add business costs"
-                text={`Your plan includes ${currency(
+                text={`Your plan includes ${money(
                   inputs.annualExpenses
                 )} of annual business expenses.`}
               />
@@ -1051,16 +1144,14 @@ export function Calculator({ initialValues }: CalculatorProps) {
               <FormulaCard
                 number="06"
                 title="Add operating protection"
-                text="The recommended rate applies a 20% safety multiplier to protect against the uncertainty of freelance work."
+                text={`The recommended rate applies a 20% safety multiplier plus a ${Math.round(
+                  country.costOfLivingIndex
+                )}% local-market pricing factor.`}
               />
             </div>
           </div>
         )}
       </section>
-
-      {/* =========================================================
-          FINAL SUMMARY
-      ========================================================== */}
 
       <section className="rounded-3xl border border-blue-100 bg-blue-50/60 p-6 sm:p-7">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -1070,18 +1161,25 @@ export function Calculator({ initialValues }: CalculatorProps) {
             </div>
 
             <h3 className="mt-2 max-w-3xl text-xl font-black tracking-tight text-zinc-950 sm:text-2xl">
-              Your freelance business needs to generate{" "}
-              {currency(results.recommendedAnnualRevenue)}{" "}
+              Your {country.name} freelance business needs to generate{" "}
+              {money(
+                results.recommendedAnnualRevenue
+              )}{" "}
               per year.
             </h3>
 
             <p className="mt-2 max-w-3xl text-xs leading-5 text-zinc-600">
               That supports your{" "}
-              {currency(inputs.targetNetIncome)} take-home goal,
-              accounts for{" "}
-              {currency(inputs.annualExpenses)} in business
-              expenses and your estimated {inputs.taxRate}% tax rate,
-              while including a 20% operating safety margin.
+              {money(
+                inputs.targetNetIncome
+              )}{" "}
+              take-home goal, accounts for{" "}
+              {money(
+                inputs.annualExpenses
+              )}{" "}
+              in business expenses and your estimated{" "}
+              {inputs.taxRate}% tax rate, while including a 20% operating
+              safety margin.
             </p>
           </div>
 
@@ -1091,7 +1189,10 @@ export function Calculator({ initialValues }: CalculatorProps) {
             </div>
 
             <div className="mt-1 text-3xl font-black tracking-tight text-zinc-950">
-              ${results.recommendedHourlyRate}
+              {money(
+                results.recommendedHourlyRate
+              )}
+
               <span className="ml-1 text-xs font-bold text-zinc-400">
                 /hr
               </span>
@@ -1102,10 +1203,6 @@ export function Calculator({ initialValues }: CalculatorProps) {
     </div>
   );
 }
-
-/* ===============================================================
-   INPUT FIELD
-================================================================ */
 
 function InputField({
   label,
@@ -1148,25 +1245,29 @@ function InputField({
         <input
           type="number"
           min="0"
-          value={value === 0 ? "" : value}
+          value={
+            value === 0
+              ? ""
+              : value
+          }
           placeholder={placeholder}
           onChange={(event) =>
-            onChange(Number(event.target.value) || 0)
+            onChange(
+              Number(event.target.value) || 0
+            )
           }
           className={[
             "w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 text-sm font-semibold text-zinc-950 outline-none transition",
             "focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10",
-            prefix ? "pl-9 pr-4" : "px-4",
+            prefix
+              ? "pl-12 pr-4"
+              : "px-4",
           ].join(" ")}
         />
       </div>
     </div>
   );
 }
-
-/* ===============================================================
-   NUMBER PLANNING INPUT
-================================================================ */
 
 function NumberPlanningInput({
   label,
@@ -1205,7 +1306,11 @@ function NumberPlanningInput({
           type="number"
           min={min}
           max={max}
-          value={value === 0 ? "" : value}
+          value={
+            value === 0
+              ? ""
+              : value
+          }
           placeholder={placeholder}
           onChange={(event) =>
             onChange(
@@ -1227,10 +1332,6 @@ function NumberPlanningInput({
   );
 }
 
-/* ===============================================================
-   RESULT STAT
-================================================================ */
-
 function ResultStat({
   label,
   value,
@@ -1250,10 +1351,6 @@ function ResultStat({
     </div>
   );
 }
-
-/* ===============================================================
-   DARK/LIGHT RESULT STAT
-================================================================ */
 
 function DarkLightStat({
   icon: Icon,
@@ -1303,10 +1400,6 @@ function DarkLightStat({
   );
 }
 
-/* ===============================================================
-   MINI METRIC
-================================================================ */
-
 function MiniMetric({
   label,
   value,
@@ -1324,6 +1417,7 @@ function MiniMetric({
 
       <div className="mt-1 text-sm font-black text-zinc-900">
         {value}{" "}
+
         {suffix && (
           <span className="text-[10px] font-semibold text-zinc-400">
             {suffix}
@@ -1333,10 +1427,6 @@ function MiniMetric({
     </div>
   );
 }
-
-/* ===============================================================
-   METRIC CARD
-================================================================ */
 
 function MetricCard({
   icon: Icon,
@@ -1350,9 +1440,12 @@ function MetricCard({
   accent?: "emerald" | "blue" | "amber";
 }) {
   const accentClasses = {
-    emerald: "bg-emerald-50 text-emerald-600",
-    blue: "bg-blue-50 text-blue-600",
-    amber: "bg-amber-50 text-amber-600",
+    emerald:
+      "bg-emerald-50 text-emerald-600",
+    blue:
+      "bg-blue-50 text-blue-600",
+    amber:
+      "bg-amber-50 text-amber-600",
   };
 
   return (
@@ -1380,10 +1473,6 @@ function MetricCard({
     </div>
   );
 }
-
-/* ===============================================================
-   ALLOCATION CARD
-================================================================ */
 
 function AllocationCard({
   label,
@@ -1413,10 +1502,6 @@ function AllocationCard({
   );
 }
 
-/* ===============================================================
-   REVENUE BAR
-================================================================ */
-
 function RevenueBar({
   label,
   value,
@@ -1445,7 +1530,10 @@ function RevenueBar({
           className={`h-full rounded-full transition-all duration-500 ${barClass}`}
           style={{
             width: `${Math.min(
-              Math.max(percentage, 0),
+              Math.max(
+                percentage,
+                0
+              ),
               100
             )}%`,
           }}
@@ -1454,10 +1542,6 @@ function RevenueBar({
     </div>
   );
 }
-
-/* ===============================================================
-   PLANNING STAT
-================================================================ */
 
 function PlanningStat({
   label,
@@ -1478,10 +1562,6 @@ function PlanningStat({
     </div>
   );
 }
-
-/* ===============================================================
-   TARGET CARD
-================================================================ */
 
 function TargetCard({
   label,
@@ -1525,11 +1605,11 @@ function TargetCard({
   );
 }
 
-/* ===============================================================
-   PROTECTION ITEM
-================================================================ */
-
-function ProtectionItem({ text }: { text: string }) {
+function ProtectionItem({
+  text,
+}: {
+  text: string;
+}) {
   return (
     <div className="flex items-center gap-2.5">
       <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
@@ -1542,10 +1622,6 @@ function ProtectionItem({ text }: { text: string }) {
     </div>
   );
 }
-
-/* ===============================================================
-   FORMULA CARD
-================================================================ */
 
 function FormulaCard({
   number,
