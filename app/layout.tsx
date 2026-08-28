@@ -48,12 +48,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <Script
+     <head>
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
 
