@@ -98,11 +98,6 @@ export function Footer() {
               <FooterLink href="/">
                 Rate Calculator
               </FooterLink>
-
-              <FooterLink href="/free-freelance-tax-calculator">
-                1099 Tax Calculator
-              </FooterLink>
-
               <FooterLink href="/w2-to-1099-calculator">
                 W-2 vs. 1099
               </FooterLink>
