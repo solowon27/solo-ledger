@@ -7,6 +7,7 @@ import { ROLES_DATA } from "@/lib/rolesData";
 import { Calculator } from "@/components/Calculator";
 import { AffiliateCard } from "@/components/AffiliateCard";
 import { AFFILIATE_LINKS } from "@/lib/affiliates";
+import { AdBanner } from "@/components/AdBanner";
 
 interface PageProps {
   params: Promise<{ role: string }>;
@@ -107,6 +108,7 @@ export default async function RoleRatePage({ params }: PageProps) {
             taxRate: data.defaultTaxRate,
           }}
         />
+        <AdBanner dataAdSlot="2784443959" />
       </section>
 
       {/* =====================================================
