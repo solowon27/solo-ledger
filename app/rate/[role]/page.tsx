@@ -13,6 +13,8 @@ interface PageProps {
   params: Promise<{ role: string }>;
 }
 
+const BASE_URL = "https://solo-ledger.com";
+
 export async function generateStaticParams() {
   return Object.keys(ROLES_DATA).map((role) => ({ role }));
 }
@@ -27,6 +29,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: data.description,
     keywords: data.seoKeywords,
     alternates: { canonical: `/rate/${data.slug}` },
+    openGraph: {
+      title: `${data.title} Hourly Rate Calculator | SoloLedger`,
+      description: data.description,
+      url: `${BASE_URL}/rate/${data.slug}`,
+      type: "website",
+    },
   };
 }
 
@@ -36,14 +44,22 @@ export default async function RoleRatePage({ params }: PageProps) {
 
   if (!data) notFound();
 
-  const jsonLd = {
+  // Pick up to 4 other roles for lateral internal linking
+  const relatedRoles = Object.entries(ROLES_DATA)
+    .filter(([slug]) => slug !== role)
+    .slice(0, 4);
+
+  const fullUrl = `${BASE_URL}/rate/${data.slug}`;
+
+  // Complete absolute structured data schemas
+  const webAppJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: `${data.title} Rate Calculator`,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web",
     description: data.description,
-    url: `/rate/${data.slug}`,
+    url: fullUrl,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -51,15 +67,44 @@ export default async function RoleRatePage({ params }: PageProps) {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: BASE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: data.category,
+        item: `${BASE_URL}/#benchmarks`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: data.shortTitle,
+        item: fullUrl,
+      },
+    ],
+  };
+
   return (
     <main className="min-h-screen bg-slate-50">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       {/* =====================================================
-          HERO (Edge-to-Edge, White Background)
+          HERO
       ====================================================== */}
       <section className="w-full border-b border-slate-200 bg-white px-6 py-16 md:px-12 lg:px-24">
         <nav className="mb-8 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-400">
@@ -87,7 +132,7 @@ export default async function RoleRatePage({ params }: PageProps) {
       </section>
 
       {/* =====================================================
-          CALCULATOR (Edge-to-Edge, Slate Background)
+          CALCULATOR
       ====================================================== */}
       <section className="w-full bg-slate-50 px-6 py-16 md:px-12 lg:px-24">
         <div className="mb-10 max-w-3xl">
@@ -112,12 +157,10 @@ export default async function RoleRatePage({ params }: PageProps) {
       </section>
 
       {/* =====================================================
-          SERVICES & EXPLANATION (Edge-to-Edge, White Background)
+          SERVICES & EXPLANATION
       ====================================================== */}
       <section className="w-full border-y border-slate-200 bg-white px-6 py-16 md:px-12 lg:px-24">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-24">
-          
-          {/* Left Context */}
           <div className="flex flex-col justify-start">
             <h2 className="text-3xl font-black tracking-tight text-slate-900">
               Your rate is more than your salary.
@@ -130,9 +173,7 @@ export default async function RoleRatePage({ params }: PageProps) {
             </p>
           </div>
 
-          {/* Right Lists */}
           <div className="flex flex-col gap-10">
-            {/* Pricing Models */}
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
@@ -152,7 +193,6 @@ export default async function RoleRatePage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Services */}
             <div>
               <h3 className="mb-5 text-lg font-black text-slate-900">
                 Highly-Billed Services
@@ -169,12 +209,47 @@ export default async function RoleRatePage({ params }: PageProps) {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
       {/* =====================================================
-          TOOLS / AFFILIATES (Edge-to-Edge, Slate Background)
+          RELATED BENCHMARKS (Lateral Crawl Paths for Google)
+      ====================================================== */}
+      <section className="w-full border-b border-slate-200 bg-white px-6 py-16 md:px-12 lg:px-24">
+        <div className="mb-8 max-w-3xl">
+          <h2 className="text-2xl font-black tracking-tight text-slate-900">
+            Explore Other Freelance Rate Benchmarks
+          </h2>
+          <p className="mt-2 text-slate-600">
+            Compare target rates, expenses, and pricing structures across other professions.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {relatedRoles.map(([slug, item]) => (
+            <Link
+              key={slug}
+              href={`/rate/${slug}`}
+              className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-blue-500 hover:bg-blue-50/50"
+            >
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 group-hover:text-blue-600">
+                  {item.category}
+                </span>
+                <h3 className="mt-2 text-base font-bold text-slate-900">
+                  {item.shortTitle}
+                </h3>
+              </div>
+              <span className="mt-4 flex items-center gap-1 text-xs font-bold text-blue-600">
+                View Calculator <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* =====================================================
+          TOOLS / AFFILIATES
       ====================================================== */}
       <section className="w-full bg-slate-50 px-6 py-16 md:px-12 lg:px-24">
         <div className="mb-10">
@@ -213,7 +288,7 @@ export default async function RoleRatePage({ params }: PageProps) {
       </section>
 
       {/* =====================================================
-          FINAL CTA (Edge-to-Edge, Solid Blue Background)
+          FINAL CTA
       ====================================================== */}
       <section className="w-full bg-blue-600 px-6 py-20 text-center md:px-12 lg:px-24">
         <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
