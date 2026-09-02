@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
@@ -12,12 +11,16 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://solo-ledger.com'),
 
   title: {
-    default: 'SoloLedger | Freelance Financial Software',
+    default: 'SoloLedger | Free Freelance Rate & Tax Calculator',
     template: '%s | SoloLedger',
   },
 
   description:
-    'Financial workspace and rate calculation engine for independent professionals.',
+    'Free freelance rate calculator and financial workspace for independent professionals, contractors, and consultants.',
+
+  alternates: {
+    canonical: './',
+  },
 
   icons: {
     icon: [
@@ -28,9 +31,9 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: 'SoloLedger | Freelance Financial Software',
+    title: 'SoloLedger | Free Freelance Rate & Tax Calculator',
     description:
-      'Financial workspace and rate calculation engine for independent professionals.',
+      'Free freelance rate calculator and financial workspace for independent professionals, contractors, and consultants.',
     url: 'https://solo-ledger.com',
     siteName: 'SoloLedger',
     type: 'website',
@@ -48,15 +51,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-     <head>
-        <script
-          async
+      <body className="antialiased bg-slate-50 text-slate-900 flex min-h-screen flex-col selection:bg-blue-200">
+        <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5417333344144399"
+          strategy="afterInteractive"
           crossOrigin="anonymous"
         />
-      </head>
 
-      <body className="antialiased bg-slate-50 text-slate-900 flex min-h-screen flex-col selection:bg-blue-200">
         <Header />
 
         <CountrySuggestion />
